@@ -43,7 +43,8 @@ ADS
 │    │    ├─log 日志管理
 │    │    ├─oss 文件存储
 │    │    ├─security 安全模块
-│    │    └─sys 系统管理(核心)
+│    │    ├─sys 系统管理(核心)
+│    │    └─analysis 五育分析模块
 │    │ 
 │    └─resources 
 │        ├─mapper   MyBatis文件
