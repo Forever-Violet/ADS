@@ -33,6 +33,106 @@ CREATE TABLE sys_school (
     unit_type tinyint COMMENT '单位类型 0省级 1市级 2区县级'
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学校管理';
 
+-- 五育-权重表
+CREATE TABLE wuyu_weight (
+   id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+   school_id INT NOT NULL COMMENT '学校ID',
+   moral DECIMAL(4, 2) NOT NULL COMMENT '德育',
+   intellectual DECIMAL(4, 2) NOT NULL COMMENT '智育',
+   physical DECIMAL(4, 2) NOT NULL COMMENT '体育',
+   artistic DECIMAL(4, 2) NOT NULL COMMENT '美育',
+   labor DECIMAL(4, 2) NOT NULL COMMENT '劳育',
+   character_ethics DECIMAL(4, 2) NOT NULL COMMENT '品德评定',
+   rewards_punishments DECIMAL(4, 2) NOT NULL COMMENT '奖惩记录',
+   moral_education_courses DECIMAL(4, 2) NOT NULL COMMENT '德育课程',
+   practical_activities DECIMAL(4, 2) NOT NULL COMMENT '实践活动',
+   online_culture DECIMAL(4, 2) NOT NULL COMMENT '网络文化',
+   interpersonal_relationships DECIMAL(4, 2) NOT NULL COMMENT '人际关系',
+   prep_management DECIMAL(4, 2) NOT NULL COMMENT '预习管理',
+   plan_management DECIMAL(4, 2) NOT NULL COMMENT '计划管理',
+   classroom_behavior DECIMAL(4, 2) NOT NULL COMMENT '课堂行为',
+   classroom_attendance DECIMAL(4, 2) NOT NULL COMMENT '课堂考勤',
+   homework_management DECIMAL(4, 2) NOT NULL COMMENT '作业管理',
+   review_management DECIMAL(4, 2) NOT NULL COMMENT '复习管理',
+   personal_abilities DECIMAL(4, 2) NOT NULL COMMENT '个人能力',
+   academic_performance DECIMAL(4, 2) NOT NULL COMMENT '学业成绩',
+   experimental_competitions DECIMAL(4, 2) NOT NULL COMMENT '实验竞赛',
+   examination_metrics DECIMAL(4, 2) NOT NULL COMMENT '体检指标',
+   physical_fitness_scores DECIMAL(4, 2) NOT NULL COMMENT '体能成绩',
+   sporting_specialties DECIMAL(4, 2) NOT NULL COMMENT '体育特长',
+   healthy_living DECIMAL(4, 2) NOT NULL COMMENT '健康生活',
+   mental_qualities DECIMAL(4, 2) NOT NULL COMMENT '心理素质',
+   physical_education_courses DECIMAL(4, 2) NOT NULL COMMENT '体育课程',
+   arts_courses DECIMAL(4, 2) NOT NULL COMMENT '美育课程',
+   arts_achievements DECIMAL(4, 2) NOT NULL COMMENT '美育成果',
+   arts_activities DECIMAL(4, 2) NOT NULL COMMENT '美育活动',
+   labor_practices DECIMAL(4, 2) NOT NULL COMMENT '劳动实践',
+   labor_courses DECIMAL(4, 2) NOT NULL COMMENT '劳动课程',
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='五育设置（五育权重表）';
+
+
+-- 五育分析
+CREATE TABLE wuyu_score (
+   id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+   weight_id INT NOT NULL COMMENT '五育权重表id',
+   student_no varchar(50) NOT NULL COMMENT '学生学号',
+   student_name varchar(100) NOT NULL COMMENT '学生姓名',
+   character_ethics DECIMAL(4, 2) NOT NULL COMMENT '品德评定',
+   rewards_punishments DECIMAL(4, 2) NOT NULL COMMENT '奖惩记录',
+   moral_education_courses DECIMAL(4, 2) NOT NULL COMMENT '德育课程',
+   practical_activities DECIMAL(4, 2) NOT NULL COMMENT '实践活动',
+   online_culture DECIMAL(4, 2) NOT NULL COMMENT '网络文化',
+   interpersonal_relationships DECIMAL(4, 2) NOT NULL COMMENT '人际关系',
+   prep_management DECIMAL(4, 2) NOT NULL COMMENT '预习管理',
+   plan_management DECIMAL(4, 2) NOT NULL COMMENT '计划管理',
+   classroom_behavior DECIMAL(4, 2) NOT NULL COMMENT '课堂行为',
+   classroom_attendance DECIMAL(4, 2) NOT NULL COMMENT '课堂考勤',
+   homework_management DECIMAL(4, 2) NOT NULL COMMENT '作业管理',
+   review_management DECIMAL(4, 2) NOT NULL COMMENT '复习管理',
+   personal_abilities DECIMAL(4, 2) NOT NULL COMMENT '个人能力',
+   academic_performance DECIMAL(4, 2) NOT NULL COMMENT '学业成绩',
+   experimental_competitions DECIMAL(4, 2) NOT NULL COMMENT '实验竞赛',
+   examination_metrics DECIMAL(4, 2) NOT NULL COMMENT '体检指标',
+   physical_fitness_scores DECIMAL(4, 2) NOT NULL COMMENT '体能成绩',
+   sporting_specialties DECIMAL(4, 2) NOT NULL COMMENT '体育特长',
+   healthy_living DECIMAL(4, 2) NOT NULL COMMENT '健康生活',
+   mental_qualities DECIMAL(4, 2) NOT NULL COMMENT '心理素质',
+   physical_education_courses DECIMAL(4, 2) NOT NULL COMMENT '体育课程',
+   arts_courses DECIMAL(4, 2) NOT NULL COMMENT '美育课程',
+   arts_achievements DECIMAL(4, 2) NOT NULL COMMENT '美育成果',
+   arts_activities DECIMAL(4, 2) NOT NULL COMMENT '美育活动',
+   labor_practices DECIMAL(4, 2) NOT NULL COMMENT '劳动实践',
+   labor_courses DECIMAL(4, 2) NOT NULL COMMENT '劳动课程',
+   comprehensive_score DECIMAL(4,2) COMMENT '五育综合成绩',
+   academic_level tinyint COMMENT '学业等级 0优, 1中, 2差',
+   INDEX idx_student_name (student_name),
+   INDEX idx_student_no (student_no)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='五育分析（五育成绩表）';
+
+
+-- 奖项设置
+CREATE TABLE award_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    topic tinyint NOT NULL COMMENT '所属五育 0德育, 1智育, 2体育, 3美育, 4劳育',
+    subtopic tinyint NOT NULL COMMENT '所属小类 0奖惩记录, 1实验与竞赛, 2学业成绩, 3体育特长, 4美育成果, 5劳动实践',
+    level tinyint NOT NULL COMMENT '级别 0国家级, 1省级, 2市厅级, 3区级, 4校级',
+    award_name VARCHAR(100) NOT NULL COMMENT '奖项名称',
+    grade VARCHAR(100) NOT NULL COMMENT '等级, 自定义',
+    remarks VARCHAR(255) COMMENT '备注'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='奖项设置';
+
+
+-- 获奖记录
+CREATE TABLE award_records (
+   id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+   student_no varchar(50) NOT NULL COMMENT '学生学号',
+   award_id INT NOT NULL COMMENT '奖项id',
+   grade VARCHAR(50) NOT NULL COMMENT '获奖等级',
+   award_date DATE NOT NULL COMMENT '获奖日期',
+   remarks VARCHAR(255) COMMENT '备注'
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='获奖记录设置';
+
+
 -- 角色管理
 create table sys_role
 (
@@ -318,14 +418,6 @@ INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, cr
 INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1067246875800000061, 1067246875800000040, '删除', '', 'sys:params:delete', 1, '', 3, 1067246875800000001, now(), 1067246875800000001, now());
 INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1156748733921165314, 1067246875800000053, '接口文档', '{{ApiUrl}}/doc.html', '', 0, 'icon-file-word', 1, 1067246875800000001, now(), 1067246875800000001, now());
 
-
-INSERT INTO sys_school(id, pid, pids, name, sort, creator, create_date, updater, update_date) VALUES (1067246875800000062, 1067246875800000063, '1067246875800000066,1067246875800000063', '技术部', 2, 1067246875800000001, now(), 1067246875800000001, now());
-INSERT INTO sys_school(id, pid, pids, name, sort, creator, create_date, updater, update_date) VALUES (1067246875800000063, 1067246875800000066, '1067246875800000066', '长沙分公司', 1, 1067246875800000001, now(), 1067246875800000001, now());
-INSERT INTO sys_school(id, pid, pids, name, sort, creator, create_date, updater, update_date) VALUES (1067246875800000064, 1067246875800000066, '1067246875800000066', '上海分公司', 0, 1067246875800000001, now(), 1067246875800000001, now());
-INSERT INTO sys_school(id, pid, pids, name, sort, creator, create_date, updater, update_date) VALUES (1067246875800000065, 1067246875800000064, '1067246875800000066,1067246875800000064', '市场部', 0, 1067246875800000001, now(), 1067246875800000001, now());
-INSERT INTO sys_school(id, pid, pids, name, sort, creator, create_date, updater, update_date) VALUES (1067246875800000066, 0, '0', '人人开源集团', 0, 1067246875800000001, now(), 1067246875800000001, now());
-INSERT INTO sys_school(id, pid, pids, name, sort, creator, create_date, updater, update_date) VALUES (1067246875800000067, 1067246875800000064, '1067246875800000066,1067246875800000064', '销售部', 0, 1067246875800000001, now(), 1067246875800000001, now());
-INSERT INTO sys_school(id, pid, pids, name, sort, creator, create_date, updater, update_date) VALUES (1067246875800000068, 1067246875800000063, '1067246875800000066,1067246875800000063', '产品部', 1, 1067246875800000001, now(), 1067246875800000001, now());
 
 INSERT INTO sys_dict_type(id, dict_type, dict_name, remark, sort, creator, create_date, updater, update_date) VALUES (1160061077912858625, 'gender', '性别', '', 0, 1067246875800000001, now(), 1067246875800000001, now());
 INSERT INTO sys_dict_data(id, dict_type_id, dict_label, dict_value, remark, sort, creator, create_date, updater, update_date) VALUES (1160061112075464705, 1160061077912858625, '男', '0', '', 0, 1067246875800000001, now(), 1067246875800000001, now());

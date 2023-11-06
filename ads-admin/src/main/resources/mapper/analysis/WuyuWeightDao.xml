@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.ads.modules.analysis.dao.WuyuWeightDao">
+
+    <resultMap type="io.ads.modules.analysis.entity.WuyuWeightEntity" id="wuyuWeightMap">
+        <result property="id" column="id"/>
+        <result property="schoolId" column="school_id"/>
+        <result property="moral" column="moral"/>
+        <result property="intellectual" column="intellectual"/>
+        <result property="physical" column="physical"/>
+        <result property="artistic" column="artistic"/>
+        <result property="labor" column="labor"/>
+        <result property="characterEthics" column="character_ethics"/>
+        <result property="rewardsPunishments" column="rewards_punishments"/>
+        <result property="moralEducationCourses" column="moral_education_courses"/>
+        <result property="practicalActivities" column="practical_activities"/>
+        <result property="onlineCulture" column="online_culture"/>
+        <result property="interpersonalRelationships" column="interpersonal_relationships"/>
+        <result property="prepManagement" column="prep_management"/>
+        <result property="planManagement" column="plan_management"/>
+        <result property="classroomBehavior" column="classroom_behavior"/>
+        <result property="classroomAttendance" column="classroom_attendance"/>
+        <result property="homeworkManagement" column="homework_management"/>
+        <result property="reviewManagement" column="review_management"/>
+        <result property="personalAbilities" column="personal_abilities"/>
+        <result property="academicPerformance" column="academic_performance"/>
+        <result property="experimentalCompetitions" column="experimental_competitions"/>
+        <result property="examinationMetrics" column="examination_metrics"/>
+        <result property="physicalFitnessScores" column="physical_fitness_scores"/>
+        <result property="sportingSpecialties" column="sporting_specialties"/>
+        <result property="healthyLiving" column="healthy_living"/>
+        <result property="mentalQualities" column="mental_qualities"/>
+        <result property="physicalEducationCourses" column="physical_education_courses"/>
+        <result property="artsCourses" column="arts_courses"/>
+        <result property="artsAchievements" column="arts_achievements"/>
+        <result property="artsActivities" column="arts_activities"/>
+        <result property="laborPractices" column="labor_practices"/>
+        <result property="laborCourses" column="labor_courses"/>
+    </resultMap>
+
+
+</mapper>

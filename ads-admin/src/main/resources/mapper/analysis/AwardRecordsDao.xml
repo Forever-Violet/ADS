@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.ads.modules.analysis.dao.AwardRecordsDao">
+
+    <resultMap type="io.ads.modules.analysis.entity.AwardRecordsEntity" id="awardRecordsMap">
+        <result property="id" column="id"/>
+        <result property="studentNo" column="student_no"/>
+        <result property="awardId" column="award_id"/>
+        <result property="grade" column="grade"/>
+        <result property="awardDate" column="award_date"/>
+        <result property="remarks" column="remarks"/>
+    </resultMap>
+
+
+</mapper>
