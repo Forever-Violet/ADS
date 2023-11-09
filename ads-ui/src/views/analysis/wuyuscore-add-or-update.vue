@@ -95,7 +95,7 @@
         <el-input v-model="dataForm.academicLevel" placeholder="学业等级 0优, 1中, 2差"></el-input>
       </el-form-item>
       </el-form>
-    <template slot="footer">
+    <template v-slot:footer>
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmitHandle()">确定</el-button>
     </template>

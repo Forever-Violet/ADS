@@ -29,11 +29,17 @@
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="username" label="用户名" sortable="custom" header-align="center" align="center"></el-table-column>
       <el-table-column prop="schoolName" label="所属学校" header-align="center" align="center"></el-table-column>
+      <el-table-column prop="realName" label="姓名" header-align="center" align="center"></el-table-column>
       <el-table-column prop="email" label="邮箱" header-align="center" align="center"></el-table-column>
       <el-table-column prop="mobile" label="手机号" sortable="custom" header-align="center" align="center"></el-table-column>
       <el-table-column prop="gender" label="性别" sortable="custom" header-align="center" align="center">
         <template v-slot="scope">
           {{ state.getDictLabel("gender", scope.row.gender) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="roleNameList" label="角色" header-align="center" align="center">
+        <template v-slot="scope">
+          <span>{{ scope.row.roleNameList.join(', ') }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="status" label="状态" sortable="custom" header-align="center" align="center">

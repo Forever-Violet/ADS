@@ -26,9 +26,13 @@ import io.ads.modules.sys.service.SysSchoolService;
 import io.ads.modules.sys.service.SysRoleUserService;
 import io.ads.modules.sys.service.SysUserService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +49,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     private final SysRoleUserService sysRoleUserService;
     private final SysSchoolService sysSchoolService;
 
+
     @Override
     public PageData<SysUserDTO> page(Map<String, Object> params) {
         //转换成like
@@ -60,9 +65,26 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
         }*/
 
         //普通管理员，只能查询所属学校的用户
-        List<SysUserEntity> list = baseDao.getList(params);
 
-        return getPageData(list, page.getTotal(), SysUserDTO.class);
+        return new PageData<>(getList(params), page.getTotal());
+        //return getPageData(dtoList, page.getTotal(), SysUserDTO.class);
+    }
+
+    private List<SysUserDTO> getList(Map<String, Object> params) {
+        List<SysUserEntity> list = baseDao.getList(params);
+        List<SysUserDTO> dtoList = new ArrayList<>(list.size());
+
+        list.forEach(entity -> {
+            SysUserDTO sysUserDTO = new SysUserDTO();
+            BeanUtils.copyProperties(entity, sysUserDTO);
+            List<Long> roleIdList = sysRoleUserService.getRoleIdList(entity.getId());
+            // 填充角色id列表
+            sysUserDTO.setRoleIdList(roleIdList);
+            // 填充角色名称列表
+            sysUserDTO.setRoleNameList(sysRoleUserService.getRoleNameList(roleIdList));
+            dtoList.add(sysUserDTO);
+        });
+        return dtoList;
     }
 
     @Override
@@ -73,10 +95,11 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
             params.put("schoolIdList", sysschoolService.getSubschoolIdList(user.getschoolId()));
         }*/
         //普通管理员，只能查询所属学校的数据
-        List<SysUserEntity> entityList = baseDao.getList(params);
-
-        return ConvertUtils.sourceToTarget(entityList, SysUserDTO.class);
+        return getList(params);
+        //return ConvertUtils.sourceToTarget(entityList, SysUserDTO.class);
     }
+
+
 
     @Override
     public SysUserDTO get(Long id) {

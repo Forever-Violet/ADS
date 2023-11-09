@@ -9,12 +9,15 @@
 package io.ads.modules.sys.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.ads.common.service.impl.BaseServiceImpl;
 import io.ads.modules.sys.dao.SysRoleUserDao;
 import io.ads.modules.sys.entity.SysRoleUserEntity;
 import io.ads.modules.sys.service.SysRoleUserService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,5 +64,17 @@ public class SysRoleUserServiceImpl extends BaseServiceImpl<SysRoleUserDao, SysR
     public List<Long> getRoleIdList(Long userId) {
 
         return baseDao.getRoleIdList(userId);
+    }
+
+    @Override
+    public List<String> getRoleNameList(List<Long> roleIdList) {
+        List<String> roleNameList = new ArrayList<>(roleIdList.size());
+        for(Long roleId : roleIdList){
+            // 查询角色名称
+            String roleName = baseDao.getRoleNameById(roleId);
+
+            roleNameList.add(roleName);
+        }
+        return roleNameList;
     }
 }

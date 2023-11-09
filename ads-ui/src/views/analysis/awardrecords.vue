@@ -10,10 +10,12 @@
     </el-form>
     <el-table v-loading="state.dataListLoading" :data="state.dataList" border @selection-change="state.dataListSelectionChangeHandle" style="width: 100%">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-              <el-table-column prop="id" label="主键" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="studentNo" label="学生学号" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="awardId" label="奖项id" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="grade" label="获奖等级" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="studentNo" label="学号" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="topic" label="所属五育" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="subtopic" label="所属小类" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="level" label="级别" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="awardName" label="奖项名称" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="grade" label="登记" header-align="center" align="center"></el-table-column>
               <el-table-column prop="awardDate" label="获奖日期" header-align="center" align="center"></el-table-column>
               <el-table-column prop="remarks" label="备注" header-align="center" align="center"></el-table-column>
             <el-table-column label="操作" fixed="right" header-align="center" align="center" width="150">

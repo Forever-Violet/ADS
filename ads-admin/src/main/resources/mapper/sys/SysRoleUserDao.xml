@@ -21,4 +21,8 @@
         select role_id from sys_role_user where user_id = #{value}
     </select>
 
+    <select id="getRoleNameById" resultType="java.lang.String">
+        select name from sys_role where id = #{value}
+    </select>
+
 </mapper>

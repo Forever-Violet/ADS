@@ -10,12 +10,11 @@
     </el-form>
     <el-table v-loading="state.dataListLoading" :data="state.dataList" border @selection-change="state.dataListSelectionChangeHandle" style="width: 100%">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-              <el-table-column prop="id" label="主键" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="topic" label="所属五育 0德育, 1智育, 2体育, 3美育, 4劳育" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="subtopic" label="所属小类 0奖惩记录, 1实验与竞赛, 2学业成绩, 3体育特长, 4美育成果, 5劳动实践" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="level" label="级别 0国家级, 1省级, 2市厅级, 3区级, 4校级" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="topic" label="所属五育" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="subtopic" label="所属小类" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="level" label="级别" header-align="center" align="center"></el-table-column>
               <el-table-column prop="awardName" label="奖项名称" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="grade" label="等级, 自定义" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="grade" label="等级" header-align="center" align="center"></el-table-column>
               <el-table-column prop="remarks" label="备注" header-align="center" align="center"></el-table-column>
             <el-table-column label="操作" fixed="right" header-align="center" align="center" width="150">
         <template v-slot="scope">
