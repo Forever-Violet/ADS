@@ -23,20 +23,21 @@ CREATE TABLE sys_user (
 
 -- 学校表
 CREATE TABLE sys_school (
-    school_id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '学校ID',
+    school_id BIGINT PRIMARY KEY COMMENT '学校ID',
     school_name VARCHAR(255) COMMENT '学校名称',
     alias VARCHAR(255) COMMENT '别名',
     full_name VARCHAR(255) COMMENT '全称',
     status tinyint COMMENT '状态 0正常 1禁用',
     education_bureau VARCHAR(255) COMMENT '所属教育局',
     create_date datetime COMMENT '创建时间',
-    unit_type tinyint COMMENT '单位类型 0省级 1市级 2区县级'
+    unit_type tinyint COMMENT '单位类型 0省级 1市级 2区县级',
+    key idx_create_date (create_date)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学校管理';
 
 -- 五育-权重表
 CREATE TABLE wuyu_weight (
-   id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
-   school_id INT NOT NULL COMMENT '学校ID',
+   id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+   school_id BIGINT NOT NULL COMMENT '学校ID',
    moral DECIMAL(4, 2) NOT NULL COMMENT '德育',
    intellectual DECIMAL(4, 2) NOT NULL COMMENT '智育',
    physical DECIMAL(4, 2) NOT NULL COMMENT '体育',
@@ -68,13 +69,15 @@ CREATE TABLE wuyu_weight (
    arts_activities DECIMAL(4, 2) NOT NULL COMMENT '美育活动',
    labor_practices DECIMAL(4, 2) NOT NULL COMMENT '劳动实践',
    labor_courses DECIMAL(4, 2) NOT NULL COMMENT '劳动课程',
+   create_date datetime COMMENT '创建时间',
+   key idx_create_date (create_date)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='五育设置（五育权重表）';
 
 
 -- 五育分析
 CREATE TABLE wuyu_score (
-   id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
-   weight_id INT NOT NULL COMMENT '五育权重表id',
+   id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+   weight_id BIGINT NOT NULL COMMENT '五育权重表id',
    student_no varchar(50) NOT NULL COMMENT '学生学号',
    student_name varchar(100) NOT NULL COMMENT '学生姓名',
    character_ethics DECIMAL(4, 2) NOT NULL COMMENT '品德评定',
@@ -105,31 +108,38 @@ CREATE TABLE wuyu_score (
    labor_courses DECIMAL(4, 2) NOT NULL COMMENT '劳动课程',
    comprehensive_score DECIMAL(4,2) COMMENT '五育综合成绩',
    academic_level tinyint COMMENT '学业等级 0优, 1中, 2差',
+   create_date datetime COMMENT '创建时间',
    INDEX idx_student_name (student_name),
-   INDEX idx_student_no (student_no)
+   INDEX idx_student_no (student_no),
+   key idx_create_date (create_date)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='五育分析（五育成绩表）';
 
 
 -- 奖项设置
 CREATE TABLE award_settings (
-    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    school_id BIGINT NOT NULL COMMENT '学校ID',
     topic tinyint NOT NULL COMMENT '所属五育 0德育, 1智育, 2体育, 3美育, 4劳育',
     subtopic tinyint NOT NULL COMMENT '所属小类 0奖惩记录, 1实验与竞赛, 2学业成绩, 3体育特长, 4美育成果, 5劳动实践',
     level tinyint NOT NULL COMMENT '级别 0国家级, 1省级, 2市厅级, 3区级, 4校级',
     award_name VARCHAR(100) NOT NULL COMMENT '奖项名称',
     grade VARCHAR(100) NOT NULL COMMENT '等级, 自定义',
-    remarks VARCHAR(255) COMMENT '备注'
+    remarks VARCHAR(255) COMMENT '备注',
+    create_date datetime COMMENT '创建时间',
+    key idx_create_date (create_date)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='奖项设置';
 
 
 -- 获奖记录
 CREATE TABLE award_records (
-   id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+   id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
    student_no varchar(50) NOT NULL COMMENT '学生学号',
-   award_id INT NOT NULL COMMENT '奖项id',
+   award_id BIGINT NOT NULL COMMENT '奖项id',
    grade VARCHAR(50) NOT NULL COMMENT '获奖等级',
    award_date DATE NOT NULL COMMENT '获奖日期',
-   remarks VARCHAR(255) COMMENT '备注'
+   remarks VARCHAR(255) COMMENT '备注',
+   create_date datetime COMMENT '创建时间',
+   key idx_create_date (create_date)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='获奖记录设置';
 
 

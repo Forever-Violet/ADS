@@ -19,11 +19,11 @@ public class WuyuScoreEntity {
     /**
      * 主键
      */
-	private Integer id;
+	private Long id;
     /**
      * 五育权重表id
      */
-	private Integer weightId;
+	private Long weightId;
     /**
      * 学生学号
      */

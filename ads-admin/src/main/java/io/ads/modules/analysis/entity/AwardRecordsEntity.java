@@ -18,7 +18,7 @@ public class AwardRecordsEntity {
     /**
      * 主键
      */
-	private Integer id;
+	private Long id;
     /**
      * 学生学号
      */
@@ -26,7 +26,7 @@ public class AwardRecordsEntity {
     /**
      * 奖项id
      */
-	private Integer awardId;
+	private Long awardId;
     /**
      * 获奖等级
      */

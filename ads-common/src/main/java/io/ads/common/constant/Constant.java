@@ -26,10 +26,7 @@ public interface Constant {
      * 菜单根节点标识
      */
     Long MENU_ROOT = 0L;
-    /**
-     * 部门根节点标识
-     */
-    Long school_ROOT = 0L;
+
     /**
      *  升序
      */

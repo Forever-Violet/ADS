@@ -18,11 +18,15 @@ public class AwardSettingsEntity {
     /**
      * 主键
      */
-	private Integer id;
+	private Long id;
     /**
      * 所属五育 0德育, 1智育, 2体育, 3美育, 4劳育
      */
 	private Integer topic;
+    /**
+     * 学校id
+     */
+    private Long schoolId;
     /**
      * 所属小类 0奖惩记录, 1实验与竞赛, 2学业成绩, 3体育特长, 4美育成果, 5劳动实践
      */

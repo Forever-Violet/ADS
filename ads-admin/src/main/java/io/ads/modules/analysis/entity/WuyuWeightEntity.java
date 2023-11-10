@@ -19,11 +19,11 @@ public class WuyuWeightEntity {
     /**
      * 主键
      */
-	private Integer id;
+	private Long id;
     /**
      * 学校ID
      */
-	private Integer schoolId;
+	private Long schoolId;
     /**
      * 德育
      */

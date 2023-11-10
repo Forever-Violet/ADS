@@ -13,5 +13,12 @@
         <result property="remarks" column="remarks"/>
     </resultMap>
 
+    <select id="getList" resultType="io.ads.modules.analysis.entity.AwardSettingsEntity">
+        select id,topic,subtopic,level,award_name,grade,remarks from award_settings
+        <if test="schoolId != null and schoolId.trim() != ''">
+            where school_id = #{schoolId}
+        </if>
+    </select>
+
 
 </mapper>

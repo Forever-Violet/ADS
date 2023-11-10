@@ -64,7 +64,6 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
             params.put("schoolIdList", sysschoolService.getSubschoolIdList(user.getschoolId()));
         }*/
 
-        //普通管理员，只能查询所属学校的用户
 
         return new PageData<>(getList(params), page.getTotal());
         //return getPageData(dtoList, page.getTotal(), SysUserDTO.class);
@@ -73,6 +72,13 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     private List<SysUserDTO> getList(Map<String, Object> params) {
         List<SysUserEntity> list = baseDao.getList(params);
         List<SysUserDTO> dtoList = new ArrayList<>(list.size());
+
+        //普通管理员，只能查询所属学校的用户
+        UserDetail user = SecurityUser.getUser();
+        if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
+            String schoolId = user.getSchoolId().toString();
+            params.put("schoolId", schoolId);
+        }
 
         list.forEach(entity -> {
             SysUserDTO sysUserDTO = new SysUserDTO();
@@ -89,11 +95,6 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
 
     @Override
     public List<SysUserDTO> list(Map<String, Object> params) {
-        //普通管理员，只能查询所属学校的数据
-/*        UserDetail user = SecurityUser.getUser();
-        if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
-            params.put("schoolIdList", sysschoolService.getSubschoolIdList(user.getschoolId()));
-        }*/
         //普通管理员，只能查询所属学校的数据
         return getList(params);
         //return ConvertUtils.sourceToTarget(entityList, SysUserDTO.class);

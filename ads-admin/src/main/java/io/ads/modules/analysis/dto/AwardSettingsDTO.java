@@ -1,5 +1,6 @@
 package io.ads.modules.analysis.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -20,7 +21,7 @@ public class AwardSettingsDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
 	@ApiModelProperty(value = "主键")
-	private Integer id;
+	private Long id;
 
 	@ApiModelProperty(value = "所属五育 0德育, 1智育, 2体育, 3美育, 4劳育")
 	private Integer topic;
@@ -39,6 +40,10 @@ public class AwardSettingsDTO implements Serializable {
 
 	@ApiModelProperty(value = "备注")
 	private String remarks;
+
+	@ApiModelProperty(value = "创建时间")
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	private Date createDate;
 
 
 }
