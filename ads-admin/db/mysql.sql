@@ -119,6 +119,7 @@ CREATE TABLE wuyu_score (
 CREATE TABLE award_settings (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
     school_id BIGINT NOT NULL COMMENT '学校ID',
+    student_name varchar(50) NOT NULL COMMENT '学生姓名',
     topic tinyint NOT NULL COMMENT '所属五育 0德育, 1智育, 2体育, 3美育, 4劳育',
     subtopic tinyint NOT NULL COMMENT '所属小类 0奖惩记录, 1实验与竞赛, 2学业成绩, 3体育特长, 4美育成果, 5劳动实践',
     level tinyint NOT NULL COMMENT '级别 0国家级, 1省级, 2市厅级, 3区级, 4校级',
@@ -149,7 +150,7 @@ create table sys_role
   id                   bigint NOT NULL COMMENT 'id',
   name                 varchar(50) COMMENT '角色名称',
   remark               varchar(100) COMMENT '备注',
-  school_id              bigint COMMENT '部门ID',
+  school_id              bigint COMMENT '学校ID',
   creator              bigint COMMENT '创建者',
   create_date          datetime COMMENT '创建时间',
   updater              bigint COMMENT '更新者',
@@ -209,7 +210,7 @@ create table sys_role_data_scope
 (
   id                   bigint NOT NULL COMMENT 'id',
   role_id              bigint COMMENT '角色ID',
-  school_id              bigint COMMENT '部门ID',
+  school_id              bigint COMMENT '学校ID',
   creator              bigint COMMENT '创建者',
   create_date          datetime COMMENT '创建时间',
   primary key (id),
@@ -386,7 +387,7 @@ INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, cr
 INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1067246875800000009, 1067246875800000007, '新增', NULL, 'sys:role:save,sys:menu:select,sys:school:list', 1, NULL, 1, 1067246875800000001, now(), 1067246875800000001, now());
 INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1067246875800000010, 1067246875800000007, '修改', NULL, 'sys:role:update,sys:menu:select,sys:school:list', 1, NULL, 2, 1067246875800000001, now(), 1067246875800000001, now());
 INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1067246875800000011, 1067246875800000007, '删除', NULL, 'sys:role:delete', 1, NULL, 3, 1067246875800000001, now(), 1067246875800000001, now());
-INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1067246875800000012, 1067246875800000002, '部门管理', 'sys/school', NULL, 0, 'icon-apartment', 1, 1067246875800000001, now(), 1067246875800000001, now());
+INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1067246875800000012, 1067246875800000002, '学校管理', 'sys/school', NULL, 0, 'icon-apartment', 1, 1067246875800000001, now(), 1067246875800000001, now());
 INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1067246875800000014, 1067246875800000012, '查看', NULL, 'sys:school:list,sys:school:info', 1, NULL, 0, 1067246875800000001, now(), 1067246875800000001, now());
 INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1067246875800000015, 1067246875800000012, '新增', NULL, 'sys:school:save', 1, NULL, 1, 1067246875800000001, now(), 1067246875800000001, now());
 INSERT INTO sys_menu (id, pid, name, url, permissions, menu_type, icon, sort, creator, create_date, updater, update_date) VALUES (1067246875800000016, 1067246875800000012, '修改', NULL, 'sys:school:update', 1, NULL, 2, 1067246875800000001, now(), 1067246875800000001, now());

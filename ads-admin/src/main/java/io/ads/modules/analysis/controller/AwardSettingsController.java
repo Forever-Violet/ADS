@@ -13,6 +13,7 @@ import io.ads.common.validator.group.UpdateGroup;
 import io.ads.modules.analysis.dto.AwardSettingsDTO;
 import io.ads.modules.analysis.excel.AwardSettingsExcel;
 import io.ads.modules.analysis.service.AwardSettingsService;
+import io.ads.modules.sys.dto.SysRoleDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,8 +55,17 @@ public class AwardSettingsController {
     @RequiresPermissions("analysis:awardsettings:page")
     public Result<PageData<AwardSettingsDTO>> page(@ApiIgnore @RequestParam Map<String, Object> params){
         PageData<AwardSettingsDTO> page = awardSettingsService.page(params);
-
         return new Result<PageData<AwardSettingsDTO>>().ok(page);
+    }
+
+
+    @GetMapping("list")
+    @ApiOperation("列表")
+    @RequiresPermissions("analysis:awardsettings:list")
+    public Result<List<AwardSettingsDTO>> list(@ApiIgnore @RequestParam Map<String, Object> params) {
+        List<AwardSettingsDTO> data = awardSettingsService.list(params);
+        System.out.println(params);
+        return new Result<List<AwardSettingsDTO>>().ok(data);
     }
 
     @GetMapping("{id}")

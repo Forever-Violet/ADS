@@ -45,5 +45,4 @@ public class AwardSettingsDTO implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	private Date createDate;
 
-
 }

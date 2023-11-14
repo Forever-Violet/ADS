@@ -10,6 +10,7 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
 import * as ElementPlusIcons from "@element-plus/icons-vue";
+import locale from "element-plus/es/locale/lang/zh-cn";
 
 import axios from "axios";
 import "virtual:svg-icons-register";
@@ -25,7 +26,7 @@ app
   .use(RenRadioGroup)
   .use(RenSelect)
   .use(RenRegionTree)
-  .use(ElementPlus, { size: "default" })
+  .use(ElementPlus, { size: "default", locale: locale })
   .mount("#app");
 
 window.axios = axios;

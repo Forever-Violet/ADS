@@ -69,7 +69,7 @@ public class SysUserDTO implements Serializable {
 	private String mobile;
 
 	@ApiModelProperty(value = "学校ID", required = true)
-	@NotNull(message="{sysuser.schoolId.require}", groups = DefaultGroup.class)
+	@NotNull(message="学校不能为空", groups = DefaultGroup.class)
 	private Long schoolId;
 
 	@ApiModelProperty(value = "状态  0：停用    1：正常", required = true)

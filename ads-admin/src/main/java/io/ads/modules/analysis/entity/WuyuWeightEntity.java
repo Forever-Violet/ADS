@@ -1,5 +1,7 @@
 package io.ads.modules.analysis.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -148,4 +150,9 @@ public class WuyuWeightEntity {
      * 劳动课程
      */
 	private BigDecimal laborCourses;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private Date createDate;
 }

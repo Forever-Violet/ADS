@@ -12,7 +12,6 @@ import app from "./constants/app";
 import { EPageLayoutEnum, EThemeColor, EThemeSetting } from "./constants/enum";
 import { IObject } from "./types/interface";
 import { getThemeConfigCache, setThemeColor, updateTheme } from "./utils/theme";
-
 export default defineComponent({
   name: "App",
   components: { Layout, FullscreenLayout, [ElConfigProvider.name]: ElConfigProvider },

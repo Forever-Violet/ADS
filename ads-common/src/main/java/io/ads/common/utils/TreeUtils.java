@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 树形结构工具类，如：菜单、部门等
+ * 树形结构工具类，如：菜单、学校等
  *
  * @author Mark sunlightcs@gmail.com
  * @since 1.0.0

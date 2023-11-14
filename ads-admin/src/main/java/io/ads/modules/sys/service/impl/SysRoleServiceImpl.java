@@ -66,12 +66,7 @@ public class SysRoleServiceImpl extends BaseServiceImpl<SysRoleDao, SysRoleEntit
         QueryWrapper<SysRoleEntity> wrapper = new QueryWrapper<>();
         wrapper.like(StrUtil.isNotBlank(name), "name", name);
 
-/*        //普通管理员，只能查询所属部门及子部门的数据
-        UserDetail user = SecurityUser.getUser();
-        if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
-            List<Long> schoolIdList = sysSchoolService.getSubschoolIdList(user.getschoolId());
-            wrapper.in(schoolIdList != null, "school_id", schoolIdList);
-        }*/
+
 
         return wrapper;
     }

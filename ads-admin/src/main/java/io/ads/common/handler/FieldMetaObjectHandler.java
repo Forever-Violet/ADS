@@ -39,7 +39,7 @@ public class FieldMetaObjectHandler implements MetaObjectHandler {
         //创建时间
         strictInsertFill(metaObject, CREATE_DATE, Date.class, date);
 
-        //创建者所属部门
+        //创建者所属学校
         strictInsertFill(metaObject, SCHOOL_ID, Long.class, user.getSchoolId());
 
         //更新者

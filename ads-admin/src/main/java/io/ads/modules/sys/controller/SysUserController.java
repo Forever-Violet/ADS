@@ -20,6 +20,7 @@ import io.ads.common.validator.ValidatorUtils;
 import io.ads.common.validator.group.AddGroup;
 import io.ads.common.validator.group.DefaultGroup;
 import io.ads.common.validator.group.UpdateGroup;
+import io.ads.modules.analysis.dto.AwardSettingsDTO;
 import io.ads.modules.security.password.PasswordUtils;
 import io.ads.modules.security.user.SecurityUser;
 import io.ads.modules.security.user.UserDetail;
@@ -71,6 +72,15 @@ public class SysUserController {
         PageData<SysUserDTO> page = sysUserService.page(params);
 
         return new Result<PageData<SysUserDTO>>().ok(page);
+    }
+
+    @GetMapping("student")
+    @ApiOperation("学生列表")
+    @RequiresPermissions("sys:user:page")
+    public Result<List<SysUserDTO>> get() {
+        List<SysUserDTO> data = sysUserService.getStudentList();
+
+        return new Result<List<SysUserDTO>>().ok(data);
     }
 
     @GetMapping("{id}")

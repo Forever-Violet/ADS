@@ -7,7 +7,7 @@
       <el-form-item>
         <ren-select v-model="state.dataForm.gender" dict-type="gender" placeholder="性别"></ren-select>
       </el-form-item>
-      <el-form-item>
+      <el-form-item v-if="hasSchoolListPermission">
         <el-select v-model="state.dataForm.schoolId" placeholder="选择学校" clearable> <!--单选 去掉multiple-->
           <el-option v-for="school in schoolList" :key="school.schoolId" :label="school.schoolName" :value="school.schoolId"></el-option>
         </el-select>
@@ -86,13 +86,18 @@ const schoolList = ref<any[]>([]);
 
 const state = reactive({ ...useView(view), ...toRefs(view) });
 
+const hasSchoolListPermission = state.hasPermission("sys:school:list"); // 检查用户是否拥有展示学校列表权限
+
 const addOrUpdateRef = ref();
 const addOrUpdateHandle = (id?: number) => {
   addOrUpdateRef.value.init(id);
 };
 
 onMounted(() => {
-  getSchoolList();
+  //超级管理员才拥有该权限
+  if (hasSchoolListPermission) {
+    getSchoolList();
+  }
 });
 
 // 获取信息

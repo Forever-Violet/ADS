@@ -32,10 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -58,27 +55,21 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
         //分页
         IPage<SysUserEntity> page = getPage(params, Constant.CREATE_DATE, false);
 
-/*        //普通管理员，只能查询所属部门及子部门的数据
-        UserDetail user = SecurityUser.getUser();
-        if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
-            params.put("schoolIdList", sysschoolService.getSubschoolIdList(user.getschoolId()));
-        }*/
-
 
         return new PageData<>(getList(params), page.getTotal());
         //return getPageData(dtoList, page.getTotal(), SysUserDTO.class);
     }
 
     private List<SysUserDTO> getList(Map<String, Object> params) {
-        List<SysUserEntity> list = baseDao.getList(params);
-        List<SysUserDTO> dtoList = new ArrayList<>(list.size());
-
         //普通管理员，只能查询所属学校的用户
         UserDetail user = SecurityUser.getUser();
         if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
             String schoolId = user.getSchoolId().toString();
             params.put("schoolId", schoolId);
         }
+
+        List<SysUserEntity> list = baseDao.getList(params);
+        List<SysUserDTO> dtoList = new ArrayList<>(list.size());
 
         list.forEach(entity -> {
             SysUserDTO sysUserDTO = new SysUserDTO();
@@ -126,6 +117,14 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
 
         //保存用户
         entity.setSuperAdmin(SuperAdminEnum.NO.value());
+
+        //普通管理员，只能插入其所属学校的用户
+        if (entity.getSchoolId() == null) { //这里只是做个校验，因为前端已经把schoolId填进去了，后端再进行一次校验
+            UserDetail user = SecurityUser.getUser();
+            if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) { //如果用户不是superAdmin
+                entity.setSchoolId(user.getSchoolId());
+            }
+        }
         insert(entity);
 
         //保存角色用户关系
@@ -179,4 +178,15 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
         return baseDao.getUserIdListBySchoolId(schoolIdList);
     }
 
+    @Override
+    public List<SysUserDTO> getStudentList() {
+        Map<String, Object> params = new HashMap<>();
+        UserDetail user = SecurityUser.getUser();
+        if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
+            // 如果用户非超级管理员，只能查询其学校的学生列表
+            String schoolId = user.getSchoolId().toString();
+            params.put("schoolId", schoolId);
+        }
+        return baseDao.getStudentList(params);
+    }
 }

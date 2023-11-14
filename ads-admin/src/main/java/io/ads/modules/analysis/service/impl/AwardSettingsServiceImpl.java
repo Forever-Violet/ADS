@@ -46,8 +46,6 @@ public class AwardSettingsServiceImpl extends CrudServiceImpl<AwardSettingsDao, 
     }
     @Override
     public PageData<AwardSettingsDTO> page(Map<String, Object> params) {
-
-
         //分页
         IPage<AwardSettingsEntity> page = getPage(params, Constant.CREATE_DATE, false);
 

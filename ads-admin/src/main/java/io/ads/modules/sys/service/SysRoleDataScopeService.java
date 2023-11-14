@@ -29,7 +29,7 @@ public interface SysRoleDataScopeService extends BaseService<SysRoleDataScopeEnt
     /**
      * 保存或修改
      * @param roleId      角色ID
-     * @param schoolIdList  部门ID列表
+     * @param schoolIdList  学校ID列表
      */
     void saveOrUpdate(Long roleId, List<Long> schoolIdList);
 

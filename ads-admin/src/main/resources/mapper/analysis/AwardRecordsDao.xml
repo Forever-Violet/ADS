@@ -6,11 +6,44 @@
     <resultMap type="io.ads.modules.analysis.entity.AwardRecordsEntity" id="awardRecordsMap">
         <result property="id" column="id"/>
         <result property="studentNo" column="student_no"/>
+        <result property="studentName" column="student_name"/>
         <result property="awardId" column="award_id"/>
         <result property="grade" column="grade"/>
         <result property="awardDate" column="award_date"/>
         <result property="remarks" column="remarks"/>
     </resultMap>
+
+    <select id="getList" resultType="io.ads.modules.analysis.entity.AwardRecordsEntity">
+        select t1.id, t1.student_no, t1.student_name, t1.award_id, t1.grade, t1.award_date, t1.remarks,
+        t2.topic, t2.subtopic, t2.level, t2.award_name
+        from award_records t1
+        join award_settings t2 on t1.award_id = t2.id
+        where 1=1
+        <if test="studentNo != null and studentNo.trim() != ''">
+            and (t1.student_no like #{studentNo} or t1.student_name like #{studentNo})
+        </if>
+        <if test="schoolId != null and schoolId.trim() != ''">
+            and t1.award_id in (select id from award_settings t2 where t2.school_id = #{schoolId})
+        </if>
+        <if test="topic != null and topic.trim() != ''">
+            and t2.topic = #{topic}
+        </if>
+        <if test="level != null and level.trim() != ''">
+            and t2.level = #{level}
+        </if>
+        <if test="(startDate != null and startDate.trim() != '') and (endDate != null and endDate.trim() != '')">
+            and t1.award_date between #{startDate} and #{endDate}
+        </if>
+
+    </select>
+
+    <select id="getById" resultType="io.ads.modules.analysis.entity.AwardRecordsEntity">
+        select t1.id, t1.student_no, t1.award_id, t1.grade, t1.award_date, t1.remarks,
+               t2.topic, t2.subtopic, t2.level, t2.award_name
+        from award_records t1
+        left join award_settings t2 on t1.award_id = t2.id
+        where t1.id = #{value}
+    </select>
 
 
 </mapper>

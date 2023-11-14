@@ -2,7 +2,7 @@
   <el-dialog v-model="visible" :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :close-on-press-escape="false">
     <el-form :model="dataForm" :rules="rules" ref="dataFormRef" @keyup.enter="dataFormSubmitHandle()" label-width="120px">
       <el-form-item label="所属五育" prop="topic">
-        <ren-select v-model="dataForm.topic" dict-type="topic" placeholder="所属五育"></ren-select>
+        <ren-select v-model="dataForm.topic" dict-type="topic" placeholder="所属五育" @change="resetSubtopicOption"></ren-select>
       </el-form-item>
       <el-form-item label="所属小类" prop="subtopic">
         <el-select v-model="dataForm.subtopic" placeholder="所属小类" clearable>
@@ -18,7 +18,7 @@
         <ren-radio-group v-model="dataForm.level" dict-type="award_level"></ren-radio-group>
       </el-form-item>
       <el-form-item label="奖项名称" prop="awardName">
-        <el-input v-model="dataForm.awardName" placeholder="奖项名称"></el-input>
+        <el-input v-model="dataForm.awardName" placeholder="奖项名称" style="width: 50%"></el-input>
       </el-form-item>
       <el-form-item label="等级" prop="grade">
         <el-radio-group v-model="dataForm.grade">
@@ -34,7 +34,7 @@
         </div>
       </el-form-item>
       <el-form-item label="备注" prop="remarks">
-        <el-input v-model="dataForm.remarks" placeholder="备注"></el-input>
+        <el-input v-model="dataForm.remarks" placeholder="备注" style="width: 50%"></el-input>
       </el-form-item>
     </el-form>
     <template v-slot:footer>
@@ -135,6 +135,11 @@ const addCustomLevel = (index: number) => {
 
 const removeCustomLevel = (index: number) => {
   customLevels.value.splice(index, 1);
+};
+
+const resetSubtopicOption = () => {
+  // 当所属五育选项改变后，置空当前的所属小类
+  dataForm.subtopic = "";
 };
 
 defineExpose({

@@ -30,7 +30,7 @@ public @interface DataFilter {
     String userId() default "creator";
 
     /**
-     * 部门ID
+     * 学校ID
      */
     String schoolId() default "school_id";
 

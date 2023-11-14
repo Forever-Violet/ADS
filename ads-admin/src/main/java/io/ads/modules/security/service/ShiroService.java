@@ -35,7 +35,7 @@ public interface ShiroService {
     SysUserEntity getUser(Long userId);
 
     /**
-     * 获取用户对应的部门数据权限
+     * 获取用户对应的学校数据权限
      * @param userId  用户ID
      * @return        返回学校ID列表
      */

@@ -1,5 +1,7 @@
 package io.ads.modules.analysis.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -47,4 +49,9 @@ public class AwardSettingsEntity {
      * 备注
      */
 	private String remarks;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private Date createDate;
 }

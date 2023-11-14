@@ -55,4 +55,8 @@ public interface SysUserService extends BaseService<SysUserEntity> {
 	 */
 	List<Long> getUserIdListBySchoolId(List<Long> schoolIdList);
 
+	/**
+	 * 获取学生列表，通过联动角色、用户角色表，且用户只能查询其学校的学生
+	 */
+	List<SysUserDTO> getStudentList();
 }

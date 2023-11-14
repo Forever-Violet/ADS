@@ -9,6 +9,7 @@
 package io.ads.modules.sys.dao;
 
 import io.ads.common.dao.BaseDao;
+import io.ads.modules.sys.dto.SysUserDTO;
 import io.ads.modules.sys.entity.SysUserEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -41,4 +42,9 @@ public interface SysUserDao extends BaseDao<SysUserEntity> {
 	 * 根据学校ID,查询学校ID列表
 	 */
 	List<Long> getUserIdListBySchoolId(List<Long> schoolIdList);
+
+	/**
+	 * 获取学生列表
+	 */
+    List<SysUserDTO> getStudentList(Map<String, Object> params);
 }

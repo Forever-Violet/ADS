@@ -4,7 +4,7 @@
       <el-form-item prop="username" label="用户名">
         <el-input v-model="dataForm.username" placeholder="用户名"></el-input>
       </el-form-item>
-      <el-form-item prop="schoolName" label="所属学校">
+      <el-form-item v-if="hasSchoolListPermission" prop="schoolName" label="所属学校">
         <el-select v-model="dataForm.schoolId" placeholder="选择学校" clearable> <!--单选 去掉multiple , clearable重置-->
           <el-option v-for="school in schoolList" :key="school.schoolId" :label="school.schoolName" :value="school.schoolId"></el-option>
         </el-select>
@@ -47,17 +47,13 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, toRefs } from "vue";
 import baseService from "@/service/baseService";
 import { isEmail, isMobile } from "@/utils/utils";
 import { IObject } from "@/types/interface";
 import { ElMessage } from "element-plus";
+import useView from "@/hooks/useView";
 const emit = defineEmits(["refreshDataList"]);
-
-const visible = ref(false);
-const roleList = ref<any[]>([]);
-const schoolList = ref<any[]>([]);
-const dataFormRef = ref();
 
 const dataForm = reactive({
   id: "",
@@ -73,6 +69,13 @@ const dataForm = reactive({
   roleIdList: [] as IObject[],
   status: 1
 });
+
+const visible = ref(false);
+const roleList = ref<any[]>([]);
+const schoolList = ref<any[]>([]);
+const dataFormRef = ref();
+const state = reactive({ ...useView(dataForm), ...toRefs(dataForm) });
+const hasSchoolListPermission = state.hasPermission("sys:school:list");
 
 const validatePassword = (rule: any, value: string, callback: (e?: Error) => any): any => {
   if (!dataForm.id && !/\S/.test(value)) {
@@ -103,7 +106,7 @@ const validateMobile = (rule: any, value: string, callback: (e?: Error) => any):
 };
 const rules = ref({
   username: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
-  schoolId: [{ required: true, message: "必填项不能为空", trigger: "change" }],
+  schoolId: [{ required: true, message: "学校不能为空", trigger: "change" }],
   password: [{ validator: validatePassword, trigger: "blur" }],
   confirmPassword: [{ validator: validateConfirmPassword, trigger: "blur" }],
   realName: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
@@ -120,17 +123,19 @@ const init = (id?: number) => {
   if (dataFormRef.value) {
     dataFormRef.value.resetFields();
   }
-
+  getCurrentUserInfo();
   Promise.all([getRoleList()]).then(() => {
     if (id) {
       getInfo(id);
     }
   });
-  Promise.all([getSchoolList()]).then(() => {
-    if (id) {
-      getInfo(id);
-    }
-  });
+  if (hasSchoolListPermission) {
+    Promise.all([getSchoolList()]).then(() => {
+      if (id) {
+        getInfo(id);
+      }
+    });
+  }
 };
 
 // 获取角色列表
@@ -151,6 +156,13 @@ const getSchoolList = () => {
 const getInfo = (id: number) => {
   baseService.get(`/sys/user/${id}`).then((res) => {
     Object.assign(dataForm, res.data);
+  });
+};
+
+// 获取当前登录用户的学校id
+const getCurrentUserInfo = () => {
+  baseService.get(`/sys/user/info`).then((res) => {
+    dataForm.schoolId = res.data.schoolId; //填充到表单
   });
 };
 
