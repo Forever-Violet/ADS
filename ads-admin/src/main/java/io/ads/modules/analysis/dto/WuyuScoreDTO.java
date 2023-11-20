@@ -8,7 +8,6 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
 
-import java.math.BigDecimal;
 
 /**
  * 五育分析（五育成绩表）
@@ -24,8 +23,8 @@ public class WuyuScoreDTO implements Serializable {
 	@ApiModelProperty(value = "主键")
 	private Long id;
 
-	@ApiModelProperty(value = "五育权重表id")
-	private Long weightId;
+	@ApiModelProperty(value = "学校id")
+	private Long schoolId;
 
 	@ApiModelProperty(value = "学生学号")
 	private String studentNo;
@@ -34,85 +33,85 @@ public class WuyuScoreDTO implements Serializable {
 	private String studentName;
 
 	@ApiModelProperty(value = "品德评定")
-	private BigDecimal characterEthics;
+	private Float characterEthics;
 
 	@ApiModelProperty(value = "奖惩记录")
-	private BigDecimal rewardsPunishments;
+	private Float rewardsPunishments;
 
 	@ApiModelProperty(value = "德育课程")
-	private BigDecimal moralEducationCourses;
+	private Float moralEducationCourses;
 
 	@ApiModelProperty(value = "实践活动")
-	private BigDecimal practicalActivities;
+	private Float practicalActivities;
 
 	@ApiModelProperty(value = "网络文化")
-	private BigDecimal onlineCulture;
+	private Float onlineCulture;
 
 	@ApiModelProperty(value = "人际关系")
-	private BigDecimal interpersonalRelationships;
+	private Float interpersonalRelationships;
 
 	@ApiModelProperty(value = "预习管理")
-	private BigDecimal prepManagement;
+	private Float prepManagement;
 
 	@ApiModelProperty(value = "计划管理")
-	private BigDecimal planManagement;
+	private Float planManagement;
 
 	@ApiModelProperty(value = "课堂行为")
-	private BigDecimal classroomBehavior;
+	private Float classroomBehavior;
 
 	@ApiModelProperty(value = "课堂考勤")
-	private BigDecimal classroomAttendance;
+	private Float classroomAttendance;
 
 	@ApiModelProperty(value = "作业管理")
-	private BigDecimal homeworkManagement;
+	private Float homeworkManagement;
 
 	@ApiModelProperty(value = "复习管理")
-	private BigDecimal reviewManagement;
+	private Float reviewManagement;
 
 	@ApiModelProperty(value = "个人能力")
-	private BigDecimal personalAbilities;
+	private Float personalAbilities;
 
 	@ApiModelProperty(value = "学业成绩")
-	private BigDecimal academicPerformance;
+	private Float academicPerformance;
 
 	@ApiModelProperty(value = "实验竞赛")
-	private BigDecimal experimentalCompetitions;
+	private Float experimentalCompetitions;
 
 	@ApiModelProperty(value = "体检指标")
-	private BigDecimal examinationMetrics;
+	private Float examinationMetrics;
 
 	@ApiModelProperty(value = "体能成绩")
-	private BigDecimal physicalFitnessScores;
+	private Float physicalFitnessScores;
 
 	@ApiModelProperty(value = "体育特长")
-	private BigDecimal sportingSpecialties;
+	private Float sportingSpecialties;
 
 	@ApiModelProperty(value = "健康生活")
-	private BigDecimal healthyLiving;
+	private Float healthyLiving;
 
 	@ApiModelProperty(value = "心理素质")
-	private BigDecimal mentalQualities;
+	private Float mentalQualities;
 
 	@ApiModelProperty(value = "体育课程")
-	private BigDecimal physicalEducationCourses;
+	private Float physicalEducationCourses;
 
 	@ApiModelProperty(value = "美育课程")
-	private BigDecimal artsCourses;
+	private Float artsCourses;
 
 	@ApiModelProperty(value = "美育成果")
-	private BigDecimal artsAchievements;
+	private Float artsAchievements;
 
 	@ApiModelProperty(value = "美育活动")
-	private BigDecimal artsActivities;
+	private Float artsActivities;
 
 	@ApiModelProperty(value = "劳动实践")
-	private BigDecimal laborPractices;
+	private Float laborPractices;
 
 	@ApiModelProperty(value = "劳动课程")
-	private BigDecimal laborCourses;
+	private Float laborCourses;
 
 	@ApiModelProperty(value = "五育综合成绩")
-	private BigDecimal comprehensiveScore;
+	private Float comprehensiveScore;
 
 	@ApiModelProperty(value = "学业等级 0优, 1中, 2差")
 	private Integer academicLevel;

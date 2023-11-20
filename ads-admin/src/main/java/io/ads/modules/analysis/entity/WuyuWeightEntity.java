@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -29,127 +28,127 @@ public class WuyuWeightEntity {
     /**
      * 德育
      */
-	private BigDecimal moral;
+	private Float moral;
     /**
      * 智育
      */
-	private BigDecimal intellectual;
+	private Float intellectual;
     /**
      * 体育
      */
-	private BigDecimal physical;
+	private Float physical;
     /**
      * 美育
      */
-	private BigDecimal artistic;
+	private Float artistic;
     /**
      * 劳育
      */
-	private BigDecimal labor;
+	private Float labor;
     /**
      * 品德评定
      */
-	private BigDecimal characterEthics;
+	private Float characterEthics;
     /**
      * 奖惩记录
      */
-	private BigDecimal rewardsPunishments;
+	private Float rewardsPunishments;
     /**
      * 德育课程
      */
-	private BigDecimal moralEducationCourses;
+	private Float moralEducationCourses;
     /**
      * 实践活动
      */
-	private BigDecimal practicalActivities;
+	private Float practicalActivities;
     /**
      * 网络文化
      */
-	private BigDecimal onlineCulture;
+	private Float onlineCulture;
     /**
      * 人际关系
      */
-	private BigDecimal interpersonalRelationships;
+	private Float interpersonalRelationships;
     /**
      * 预习管理
      */
-	private BigDecimal prepManagement;
+	private Float prepManagement;
     /**
      * 计划管理
      */
-	private BigDecimal planManagement;
+	private Float planManagement;
     /**
      * 课堂行为
      */
-	private BigDecimal classroomBehavior;
+	private Float classroomBehavior;
     /**
      * 课堂考勤
      */
-	private BigDecimal classroomAttendance;
+	private Float classroomAttendance;
     /**
      * 作业管理
      */
-	private BigDecimal homeworkManagement;
+	private Float homeworkManagement;
     /**
      * 复习管理
      */
-	private BigDecimal reviewManagement;
+	private Float reviewManagement;
     /**
      * 个人能力
      */
-	private BigDecimal personalAbilities;
+	private Float personalAbilities;
     /**
      * 学业成绩
      */
-	private BigDecimal academicPerformance;
+	private Float academicPerformance;
     /**
      * 实验竞赛
      */
-	private BigDecimal experimentalCompetitions;
+	private Float experimentalCompetitions;
     /**
      * 体检指标
      */
-	private BigDecimal examinationMetrics;
+	private Float examinationMetrics;
     /**
      * 体能成绩
      */
-	private BigDecimal physicalFitnessScores;
+	private Float physicalFitnessScores;
     /**
      * 体育特长
      */
-	private BigDecimal sportingSpecialties;
+	private Float sportingSpecialties;
     /**
      * 健康生活
      */
-	private BigDecimal healthyLiving;
+	private Float healthyLiving;
     /**
      * 心理素质
      */
-	private BigDecimal mentalQualities;
+	private Float mentalQualities;
     /**
      * 体育课程
      */
-	private BigDecimal physicalEducationCourses;
+	private Float physicalEducationCourses;
     /**
      * 美育课程
      */
-	private BigDecimal artsCourses;
+	private Float artsCourses;
     /**
      * 美育成果
      */
-	private BigDecimal artsAchievements;
+	private Float artsAchievements;
     /**
      * 美育活动
      */
-	private BigDecimal artsActivities;
+	private Float artsActivities;
     /**
      * 劳动实践
      */
-	private BigDecimal laborPractices;
+	private Float laborPractices;
     /**
      * 劳动课程
      */
-	private BigDecimal laborCourses;
+	private Float laborCourses;
     /**
      * 创建时间
      */

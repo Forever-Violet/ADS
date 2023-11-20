@@ -8,38 +8,48 @@
         <el-button v-if="state.hasPermission('analysis:wuyuscore:delete')" type="danger" @click="state.deleteHandle()">删除</el-button>
       </el-form-item>
     </el-form>
-    <el-table v-loading="state.dataListLoading" :data="state.dataList" border @selection-change="state.dataListSelectionChangeHandle" style="width: 100%">
+    <el-table v-loading="state.dataListLoading" :data="state.dataList" border :cell-border="true" @selection-change="state.dataListSelectionChangeHandle" style="width: 100%">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-              <el-table-column prop="id" label="主键" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="weightId" label="五育权重表id" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="studentNo" label="学生学号" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="studentName" label="学生姓名" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="characterEthics" label="品德评定" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="rewardsPunishments" label="奖惩记录" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="moralEducationCourses" label="德育课程" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="practicalActivities" label="实践活动" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="onlineCulture" label="网络文化" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="interpersonalRelationships" label="人际关系" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="prepManagement" label="预习管理" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="planManagement" label="计划管理" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="classroomBehavior" label="课堂行为" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="classroomAttendance" label="课堂考勤" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="homeworkManagement" label="作业管理" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="reviewManagement" label="复习管理" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="personalAbilities" label="个人能力" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="academicPerformance" label="学业成绩" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="experimentalCompetitions" label="实验竞赛" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="examinationMetrics" label="体检指标" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="physicalFitnessScores" label="体能成绩" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="sportingSpecialties" label="体育特长" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="healthyLiving" label="健康生活" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="mentalQualities" label="心理素质" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="physicalEducationCourses" label="体育课程" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="artsCourses" label="美育课程" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="artsAchievements" label="美育成果" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="artsActivities" label="美育活动" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="laborPractices" label="劳动实践" header-align="center" align="center"></el-table-column>
-              <el-table-column prop="laborCourses" label="劳动课程" header-align="center" align="center"></el-table-column>
+<!--              <el-table-column prop="id" label="主键" header-align="center" align="center"></el-table-column>
+              <el-table-column prop="weightId" label="五育权重表id" header-align="center" align="center"></el-table-column>-->
+              <el-table-column prop="studentNo" label="学生学号" header-align="center" align="center" width="100"></el-table-column>
+              <el-table-column prop="studentName" label="学生姓名" header-align="center" align="center" width="100"></el-table-column>
+              <el-table-column label="德育" align="center">
+                <el-table-column prop="characterEthics" label="品德评定" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="rewardsPunishments" label="奖惩记录" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="moralEducationCourses" label="德育课程" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="practicalActivities" label="实践活动" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="onlineCulture" label="网络文化" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="interpersonalRelationships" label="人际关系" header-align="center" align="center" width="100"></el-table-column>
+              </el-table-column>
+              <el-table-column label="智育" align="center">
+                <el-table-column prop="prepManagement" label="预习管理" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="planManagement" label="计划管理" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="classroomBehavior" label="课堂行为" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="classroomAttendance" label="课堂考勤" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="homeworkManagement" label="作业管理" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="reviewManagement" label="复习管理" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="personalAbilities" label="个人能力" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="academicPerformance" label="学业成绩" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="experimentalCompetitions" label="实验竞赛" header-align="center" align="center" width="100"></el-table-column>
+              </el-table-column>
+              <el-table-column label="体育" align="center">
+                <el-table-column prop="examinationMetrics" label="体检指标" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="physicalFitnessScores" label="体能成绩" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="sportingSpecialties" label="体育特长" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="healthyLiving" label="健康生活" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="mentalQualities" label="心理素质" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="physicalEducationCourses" label="体育课程" header-align="center" align="center" width="100"></el-table-column>
+              </el-table-column>
+              <el-table-column label="美育" align="center">
+                <el-table-column prop="artsCourses" label="美育课程" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="artsAchievements" label="美育成果" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="artsActivities" label="美育活动" header-align="center" align="center" width="100"></el-table-column>
+              </el-table-column>
+              <el-table-column label="劳育" align="center">
+                <el-table-column prop="laborPractices" label="劳动实践" header-align="center" align="center" width="100"></el-table-column>
+                <el-table-column prop="laborCourses" label="劳动课程" header-align="center" align="center" width="100"></el-table-column>
+              </el-table-column>
               <el-table-column prop="comprehensiveScore" label="五育综合成绩" header-align="center" align="center"></el-table-column>
               <el-table-column prop="academicLevel" label="学业等级 0优, 1中, 2差" header-align="center" align="center"></el-table-column>
             <el-table-column label="操作" fixed="right" header-align="center" align="center" width="150">

@@ -40,7 +40,7 @@ public class WuyuWeightController {
     @Autowired
     private WuyuWeightService wuyuWeightService;
 
-    @GetMapping("page")
+/*    @GetMapping("page")
     @ApiOperation("分页")
     @ApiImplicitParams({
         @ApiImplicitParam(name = Constant.PAGE, value = "当前页码，从1开始", paramType = "query", required = true, dataType="int") ,
@@ -53,15 +53,22 @@ public class WuyuWeightController {
         PageData<WuyuWeightDTO> page = wuyuWeightService.page(params);
 
         return new Result<PageData<WuyuWeightDTO>>().ok(page);
-    }
+    }*/
 
-    @GetMapping("{id}")
+/*    @GetMapping("{id}")
     @ApiOperation("信息")
     @RequiresPermissions("analysis:wuyuweight:info")
     public Result<WuyuWeightDTO> get(@PathVariable("id") Long id){
         WuyuWeightDTO data = wuyuWeightService.get(id);
 
         return new Result<WuyuWeightDTO>().ok(data);
+    }*/
+
+    @GetMapping("info")
+    @ApiOperation("根据学校id获取信息")
+    @RequiresPermissions("analysis:wuyuweight:info")
+    public Result<WuyuWeightDTO> getBySchoolId(@ApiIgnore @RequestParam Map<String, Object> params){
+        return new Result<WuyuWeightDTO>().ok(wuyuWeightService.getBySchoolId(params));
     }
 
     @PostMapping
@@ -90,6 +97,7 @@ public class WuyuWeightController {
         return new Result();
     }
 
+/*
     @DeleteMapping
     @ApiOperation("删除")
     @LogOperation("删除")
@@ -102,6 +110,7 @@ public class WuyuWeightController {
 
         return new Result();
     }
+*/
 
     @GetMapping("export")
     @ApiOperation("导出")

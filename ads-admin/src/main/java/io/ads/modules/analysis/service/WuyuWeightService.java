@@ -4,6 +4,8 @@ import io.ads.common.service.CrudService;
 import io.ads.modules.analysis.dto.WuyuWeightDTO;
 import io.ads.modules.analysis.entity.WuyuWeightEntity;
 
+import java.util.Map;
+
 /**
  * 五育设置（五育权重表）
  *
@@ -12,4 +14,7 @@ import io.ads.modules.analysis.entity.WuyuWeightEntity;
  */
 public interface WuyuWeightService extends CrudService<WuyuWeightEntity, WuyuWeightDTO> {
 
+    WuyuWeightDTO getBySchoolId(Map<String, Object> params);
+
+    void update(WuyuWeightDTO wuyuWeightDTO);
 }
