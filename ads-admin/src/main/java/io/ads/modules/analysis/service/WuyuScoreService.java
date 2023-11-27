@@ -1,6 +1,7 @@
 package io.ads.modules.analysis.service;
 
 import io.ads.common.service.CrudService;
+import io.ads.modules.analysis.dto.WuyuAnalysisResultDTO;
 import io.ads.modules.analysis.dto.WuyuScoreDTO;
 import io.ads.modules.analysis.entity.WuyuScoreEntity;
 
@@ -12,4 +13,19 @@ import io.ads.modules.analysis.entity.WuyuScoreEntity;
  */
 public interface WuyuScoreService extends CrudService<WuyuScoreEntity, WuyuScoreDTO> {
 
+    void save(WuyuScoreDTO dto);
+
+
+    /**
+     * 生成个人诊断报告，若已存在则直接获取
+     * @param id 五育分数id
+     * @return WuyuAnalysisResultDTO
+     */
+    WuyuAnalysisResultDTO genOrGetAnalysisReport(Long id);
+
+    /**
+     * 重新生成个人诊断报告，若不存在则直接重新生成
+     * @param id 五育分数id
+     */
+    void reGenAnalysisReport(Long id);
 }

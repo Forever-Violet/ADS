@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -33,12 +34,15 @@ public class AwardSettingsDTO implements Serializable {
 	private Integer level;
 
 	@ApiModelProperty(value = "奖项名称")
+	@Length(max = 100, min = 0, message = "奖项名称超过字数限制（100字）！")
 	private String awardName;
 
 	@ApiModelProperty(value = "等级, 自定义")
+	@Length(max = 100, min = 0, message = "超过等级字数限制！")
 	private String grade;
 
 	@ApiModelProperty(value = "备注")
+	@Length(max = 255, min = 0, message = "超过备注字数限制！")
 	private String remarks;
 
 	@ApiModelProperty(value = "创建时间")

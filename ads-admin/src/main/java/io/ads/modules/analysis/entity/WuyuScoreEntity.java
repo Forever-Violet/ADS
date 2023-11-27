@@ -36,111 +36,115 @@ public class WuyuScoreEntity {
     /**
      * 品德评定
      */
-	private Float characterEthics;
+	private Integer characterEthics;
     /**
      * 奖惩记录
      */
-	private Float rewardsPunishments;
+	private Integer rewardsPunishments;
     /**
      * 德育课程
      */
-	private Float moralEducationCourses;
+	private Integer moralEducationCourses;
     /**
      * 实践活动
      */
-	private Float practicalActivities;
+	private Integer practicalActivities;
     /**
      * 网络文化
      */
-	private Float onlineCulture;
+	private Integer onlineCulture;
     /**
      * 人际关系
      */
-	private Float interpersonalRelationships;
+	private Integer interpersonalRelationships;
     /**
      * 预习管理
      */
-	private Float prepManagement;
+	private Integer prepManagement;
     /**
      * 计划管理
      */
-	private Float planManagement;
+	private Integer planManagement;
     /**
      * 课堂行为
      */
-	private Float classroomBehavior;
+	private Integer classroomBehavior;
     /**
      * 课堂考勤
      */
-	private Float classroomAttendance;
+	private Integer classroomAttendance;
     /**
      * 作业管理
      */
-	private Float homeworkManagement;
+	private Integer homeworkManagement;
     /**
      * 复习管理
      */
-	private Float reviewManagement;
+	private Integer reviewManagement;
     /**
      * 个人能力
      */
-	private Float personalAbilities;
+	private Integer personalAbilities;
     /**
      * 学业成绩
      */
-	private Float academicPerformance;
+	private Integer academicPerformance;
     /**
      * 实验竞赛
      */
-	private Float experimentalCompetitions;
+	private Integer experimentalCompetitions;
     /**
      * 体检指标
      */
-	private Float examinationMetrics;
+	private Integer examinationMetrics;
     /**
      * 体能成绩
      */
-	private Float physicalFitnessScores;
+	private Integer physicalFitnessScores;
     /**
      * 体育特长
      */
-	private Float sportingSpecialties;
+	private Integer sportingSpecialties;
     /**
      * 健康生活
      */
-	private Float healthyLiving;
+	private Integer healthyLiving;
     /**
      * 心理素质
      */
-	private Float mentalQualities;
+	private Integer mentalQualities;
     /**
      * 体育课程
      */
-	private Float physicalEducationCourses;
+	private Integer physicalEducationCourses;
     /**
      * 美育课程
      */
-	private Float artsCourses;
+	private Integer artsCourses;
     /**
      * 美育成果
      */
-	private Float artsAchievements;
+	private Integer artsAchievements;
     /**
      * 美育活动
      */
-	private Float artsActivities;
+	private Integer artsActivities;
     /**
      * 劳动实践
      */
-	private Float laborPractices;
+	private Integer laborPractices;
     /**
      * 劳动课程
      */
-	private Float laborCourses;
+	private Integer laborCourses;
     /**
      * 五育综合成绩
      */
-	private Float comprehensiveScore;
+	private Integer comprehensiveScore;
+    /**
+     * 综合等级 0优，1中, 2差
+     */
+    private Integer comprehensiveLevel;
     /**
      * 学业等级 0优, 1中, 2差
      */

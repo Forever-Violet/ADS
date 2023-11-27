@@ -5,6 +5,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -33,85 +36,144 @@ public class WuyuScoreDTO implements Serializable {
 	private String studentName;
 
 	@ApiModelProperty(value = "品德评定")
-	private Float characterEthics;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer characterEthics;
 
 	@ApiModelProperty(value = "奖惩记录")
-	private Float rewardsPunishments;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer rewardsPunishments;
 
 	@ApiModelProperty(value = "德育课程")
-	private Float moralEducationCourses;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer moralEducationCourses;
 
 	@ApiModelProperty(value = "实践活动")
-	private Float practicalActivities;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer practicalActivities;
 
 	@ApiModelProperty(value = "网络文化")
-	private Float onlineCulture;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer onlineCulture;
 
 	@ApiModelProperty(value = "人际关系")
-	private Float interpersonalRelationships;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer interpersonalRelationships;
+
 
 	@ApiModelProperty(value = "预习管理")
-	private Float prepManagement;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer prepManagement;
 
 	@ApiModelProperty(value = "计划管理")
-	private Float planManagement;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer planManagement;
 
 	@ApiModelProperty(value = "课堂行为")
-	private Float classroomBehavior;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer classroomBehavior;
 
 	@ApiModelProperty(value = "课堂考勤")
-	private Float classroomAttendance;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer classroomAttendance;
 
 	@ApiModelProperty(value = "作业管理")
-	private Float homeworkManagement;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer homeworkManagement;
 
 	@ApiModelProperty(value = "复习管理")
-	private Float reviewManagement;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer reviewManagement;
 
 	@ApiModelProperty(value = "个人能力")
-	private Float personalAbilities;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer personalAbilities;
 
 	@ApiModelProperty(value = "学业成绩")
-	private Float academicPerformance;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer academicPerformance;
 
 	@ApiModelProperty(value = "实验竞赛")
-	private Float experimentalCompetitions;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer experimentalCompetitions;
+
 
 	@ApiModelProperty(value = "体检指标")
-	private Float examinationMetrics;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer examinationMetrics;
 
 	@ApiModelProperty(value = "体能成绩")
-	private Float physicalFitnessScores;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer physicalFitnessScores;
 
 	@ApiModelProperty(value = "体育特长")
-	private Float sportingSpecialties;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer sportingSpecialties;
 
 	@ApiModelProperty(value = "健康生活")
-	private Float healthyLiving;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer healthyLiving;
 
 	@ApiModelProperty(value = "心理素质")
-	private Float mentalQualities;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer mentalQualities;
 
 	@ApiModelProperty(value = "体育课程")
-	private Float physicalEducationCourses;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer physicalEducationCourses;
+
 
 	@ApiModelProperty(value = "美育课程")
-	private Float artsCourses;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer artsCourses;
 
 	@ApiModelProperty(value = "美育成果")
-	private Float artsAchievements;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer artsAchievements;
 
 	@ApiModelProperty(value = "美育活动")
-	private Float artsActivities;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer artsActivities;
+
 
 	@ApiModelProperty(value = "劳动实践")
-	private Float laborPractices;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer laborPractices;
 
 	@ApiModelProperty(value = "劳动课程")
-	private Float laborCourses;
+	@Max(value = 100, message = "分数必须小于等于100")
+	@Min(value = 0, message = "分数必须大于等于0")
+	private Integer laborCourses;
 
 	@ApiModelProperty(value = "五育综合成绩")
-	private Float comprehensiveScore;
+	private Integer comprehensiveScore;
+
+	@ApiModelProperty(value = "五育综合等级 0优, 1中, 2差")
+	private Integer comprehensiveLevel;
 
 	@ApiModelProperty(value = "学业等级 0优, 1中, 2差")
 	private Integer academicLevel;

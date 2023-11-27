@@ -5,11 +5,9 @@ import io.ads.common.constant.Constant;
 import io.ads.common.page.PageData;
 import io.ads.common.utils.ExcelUtils;
 import io.ads.common.utils.Result;
+import io.ads.common.utils.ValidDtoUtils;
 import io.ads.common.validator.AssertUtils;
-import io.ads.common.validator.ValidatorUtils;
-import io.ads.common.validator.group.AddGroup;
-import io.ads.common.validator.group.DefaultGroup;
-import io.ads.common.validator.group.UpdateGroup;
+import io.ads.modules.analysis.dto.WuyuAnalysisResultDTO;
 import io.ads.modules.analysis.dto.WuyuScoreDTO;
 import io.ads.modules.analysis.excel.WuyuScoreExcel;
 import io.ads.modules.analysis.service.WuyuScoreService;
@@ -19,10 +17,12 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -68,9 +68,19 @@ public class WuyuScoreController {
     @ApiOperation("保存")
     @LogOperation("保存")
     @RequiresPermissions("analysis:wuyuscore:save")
-    public Result save(@RequestBody WuyuScoreDTO dto){
+    public Result save(@Valid @RequestBody WuyuScoreDTO dto, BindingResult result){
+        ValidDtoUtils.throwValidateException(result);
+/*        if (result.hasErrors()) {
+            // dto校验出异常，在这里处理
+            List<String> errMessages = new ArrayList<>();
+            for (ObjectError error : result.getAllErrors()) {
+                errMessages.add(error.getDefaultMessage());
+            }
+            throw new RenException(errMessages.toString());
+        }*/
+
         //效验数据
-        ValidatorUtils.validateEntity(dto, AddGroup.class, DefaultGroup.class);
+        //ValidatorUtils.validateEntity(dto, AddGroup.class, DefaultGroup.class);
 
         wuyuScoreService.save(dto);
 
@@ -81,9 +91,8 @@ public class WuyuScoreController {
     @ApiOperation("修改")
     @LogOperation("修改")
     @RequiresPermissions("analysis:wuyuscore:update")
-    public Result update(@RequestBody WuyuScoreDTO dto){
-        //效验数据
-        ValidatorUtils.validateEntity(dto, UpdateGroup.class, DefaultGroup.class);
+    public Result update(@Valid @RequestBody WuyuScoreDTO dto, BindingResult result){
+        ValidDtoUtils.throwValidateException(result);
 
         wuyuScoreService.update(dto);
 
@@ -102,6 +111,28 @@ public class WuyuScoreController {
 
         return new Result();
     }
+
+
+    @GetMapping("individual/{id}")
+    @ApiOperation("个人诊断报告")
+    @LogOperation("个人诊断")
+    @RequiresPermissions("analysis:wuyuscore:individual")
+    public Result individualAnalysis(@PathVariable("id") Long id) {
+        WuyuAnalysisResultDTO dto = wuyuScoreService.genOrGetAnalysisReport(id);
+
+        return new Result<WuyuAnalysisResultDTO>().ok(dto);
+    }
+
+    @PutMapping("individual/re/{id}")
+    @ApiOperation("重新生成个人诊断报告")
+    @LogOperation("re个人诊断")
+    @RequiresPermissions("analysis:wuyuscore:individual")
+    public Result reIndividualAnalysis(@PathVariable("id") Long id) {
+        wuyuScoreService.reGenAnalysisReport(id);
+
+        return new Result();
+    }
+
 
     @GetMapping("export")
     @ApiOperation("导出")

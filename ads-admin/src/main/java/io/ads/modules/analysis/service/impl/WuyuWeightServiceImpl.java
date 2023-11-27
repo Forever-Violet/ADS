@@ -42,7 +42,7 @@ public class WuyuWeightServiceImpl extends CrudServiceImpl<WuyuWeightDao, WuyuWe
 
     @Override
     public WuyuWeightDTO getBySchoolId(Map<String, Object> params) {
-        String schoolId = (String) params.get("schoolId");
+        String schoolId = params.get("schoolId").toString();
         LambdaQueryWrapper<WuyuWeightEntity> lqw = new LambdaQueryWrapper<>();
 
         if (schoolId == null || "".equals(schoolId)) { //非管理员用户查询，或超级管理员未选中学校, 这里得加上判断空字符串，不然转换类型会报错

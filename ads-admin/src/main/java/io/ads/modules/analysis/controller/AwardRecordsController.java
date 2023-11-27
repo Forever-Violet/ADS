@@ -5,6 +5,7 @@ import io.ads.common.constant.Constant;
 import io.ads.common.page.PageData;
 import io.ads.common.utils.ExcelUtils;
 import io.ads.common.utils.Result;
+import io.ads.common.utils.ValidDtoUtils;
 import io.ads.common.validator.AssertUtils;
 import io.ads.common.validator.ValidatorUtils;
 import io.ads.common.validator.group.AddGroup;
@@ -19,10 +20,12 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -68,9 +71,10 @@ public class AwardRecordsController {
     @ApiOperation("保存")
     @LogOperation("保存")
     @RequiresPermissions("analysis:awardrecords:save")
-    public Result save(@RequestBody AwardRecordsDTO dto){
+    public Result save(@Valid @RequestBody AwardRecordsDTO dto, BindingResult result){ //@Valid开启校验
+        ValidDtoUtils.throwValidateException(result);
         //效验数据
-        ValidatorUtils.validateEntity(dto, AddGroup.class, DefaultGroup.class);
+        //ValidatorUtils.validateEntity(dto, AddGroup.class, DefaultGroup.class);
 
         awardRecordsService.save(dto);
 
@@ -81,9 +85,10 @@ public class AwardRecordsController {
     @ApiOperation("修改")
     @LogOperation("修改")
     @RequiresPermissions("analysis:awardrecords:update")
-    public Result update(@RequestBody AwardRecordsDTO dto){
+    public Result update(@Valid @RequestBody AwardRecordsDTO dto, BindingResult result){
+        ValidDtoUtils.throwValidateException(result);
         //效验数据
-        ValidatorUtils.validateEntity(dto, UpdateGroup.class, DefaultGroup.class);
+        //ValidatorUtils.validateEntity(dto, UpdateGroup.class, DefaultGroup.class);
 
         awardRecordsService.update(dto);
 
