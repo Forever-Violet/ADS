@@ -16,6 +16,7 @@ import java.util.Date;
 @Data
 @TableName("wuyu_weight")
 public class WuyuWeightEntity {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 主键

@@ -5,7 +5,7 @@
         <el-input v-model="dataForm.username" placeholder="用户名"></el-input>
       </el-form-item>
       <el-form-item v-if="hasSchoolListPermission" prop="schoolName" label="所属学校">
-        <el-select v-model="dataForm.schoolId" placeholder="选择学校" clearable> <!--单选 去掉multiple , clearable重置-->
+        <el-select v-model="dataForm.schoolId" placeholder="选择学校" clearable @change="resetClassList"> <!--单选 去掉multiple , clearable重置-->
           <el-option v-for="school in schoolList" :key="school.schoolId" :label="school.schoolName" :value="school.schoolId"></el-option>
         </el-select>
       </el-form-item>
@@ -30,6 +30,11 @@
       <el-form-item prop="roleIdList" label="角色配置" class="role-list">  <!--多选-->
         <el-select v-model="dataForm.roleIdList" multiple placeholder="角色配置">
           <el-option v-for="role in roleList" :key="role.id" :label="role.name" :value="role.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item prop="classIdList" label="班级配置" class="role-list">
+        <el-select v-model="dataForm.classIdList" multiple placeholder="班级配置">
+          <el-option v-for="clazz in classList" :key="clazz.id" :label="clazz.gradeName + '-' + clazz.className" :value="clazz.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item prop="status" label="状态">
@@ -67,11 +72,13 @@ const dataForm = reactive({
   email: "",
   mobile: "",
   roleIdList: [] as IObject[],
+  classIdList: [] as IObject[],
   status: 1
 });
 
 const visible = ref(false);
 const roleList = ref<any[]>([]);
+const classList = ref<any[]>([]);
 const schoolList = ref<any[]>([]);
 const dataFormRef = ref();
 const state = reactive({ ...useView(dataForm), ...toRefs(dataForm) });
@@ -124,17 +131,13 @@ const init = (id?: number) => {
     dataFormRef.value.resetFields();
   }
   getCurrentUserInfo();
-  Promise.all([getRoleList()]).then(() => {
-    if (id) {
-      getInfo(id);
-    }
-  });
+  getClassList();
+  getRoleList();
+  if (id) {
+    getInfo(id);
+  }
   if (hasSchoolListPermission) {
-    Promise.all([getSchoolList()]).then(() => {
-      if (id) {
-        getInfo(id);
-      }
-    });
+    getSchoolList();
   }
 };
 
@@ -143,6 +146,22 @@ const getRoleList = () => {
   return baseService.get("/sys/role/list").then((res) => {
     roleList.value = res.data;
   });
+};
+
+// 获取班级列表
+const getClassList = () => {
+  let schoolId = "";
+  if (dataForm.schoolId != "") {
+    schoolId = dataForm.schoolId;
+  }
+  return baseService.get("/sys/class/list", { schoolId }).then((res) => {
+    classList.value = res.data;
+  });
+};
+// 当学校选项改变后，重新查询班级列表，并重置当前的班级选项
+const resetClassList = () => {
+  dataForm.classIdList = [];
+  getClassList();
 };
 
 // 获取学校列表
@@ -156,6 +175,7 @@ const getSchoolList = () => {
 const getInfo = (id: number) => {
   baseService.get(`/sys/user/${id}`).then((res) => {
     Object.assign(dataForm, res.data);
+    getClassList(); // 在这里重新获取一下，因为修改页面需要用到schoolId去获取班级列表，而在init中，getInfo还没执行完就执行了getClassList
   });
 };
 

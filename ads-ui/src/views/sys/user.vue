@@ -13,6 +13,11 @@
         </el-select>
       </el-form-item>
       <el-form-item>
+        <el-select v-model="state.dataForm.roleId" placeholder="选择角色" clearable>
+          <el-option v-for="role in roleList" :key="role.id" :label="role.name" :value="role.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
         <el-button @click="state.getDataList()">查询</el-button>
       </el-form-item>
       <el-form-item>
@@ -40,6 +45,11 @@
       <el-table-column prop="roleNameList" label="角色" header-align="center" align="center">
         <template v-slot="scope">
           <span>{{ scope.row.roleNameList.join(', ') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="classNameList" label="班级" header-align="center" align="center" width="280">
+        <template v-slot="scope">
+          <span>{{ scope.row.classNameList.join(', ') }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="status" label="状态" sortable="custom" header-align="center" align="center">
@@ -78,12 +88,13 @@ const view = reactive({
   dataForm: {
     username: "",
     schoolId: "",
+    roleId: "",
     postId: "",
     gender: ""
   }
 });
 const schoolList = ref<any[]>([]);
-
+const roleList = ref<any[]>([]);
 const state = reactive({ ...useView(view), ...toRefs(view) });
 
 const hasSchoolListPermission = state.hasPermission("sys:school:list"); // 检查用户是否拥有展示学校列表权限
@@ -98,14 +109,15 @@ onMounted(() => {
   if (hasSchoolListPermission) {
     getSchoolList();
   }
+  getRoleList();
 });
 
-// 获取信息
-/*const getInfo = (id: number) => {
-  baseService.get(`/sys/user/${id}`).then((res) => {
-    Object.assign(view.dataForm, res.data);
+// 获取角色列表
+const getRoleList = () => {
+  return baseService.get("/sys/role/list").then((res) => {
+    roleList.value = res.data;
   });
-};*/
+};
 
 // 获取学校列表
 const getSchoolList = () => {

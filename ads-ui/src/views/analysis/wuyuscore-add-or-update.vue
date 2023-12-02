@@ -1,8 +1,16 @@
 <template>
-  <el-dialog v-model="visible" :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false"
-             :close-on-press-escape="false" width="600px">
-    <el-form :model="dataForm" :rules="rules" ref="dataFormRef" @keyup.enter="dataFormSubmitHandle()"
-             label-width="120px">
+  <el-dialog v-model="visible" :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :close-on-press-escape="false" width="600px">
+    <el-form :model="dataForm" :rules="rules" ref="dataFormRef" @keyup.enter="dataFormSubmitHandle()" label-width="120px">
+      <el-form-item v-if="hasSchoolListPermission && !dataForm.id" prop="schoolName" label="所属学校">
+        <el-select v-model="dataForm.schoolId" placeholder="选择学校" clearable @change="getSemesterList">
+          <el-option v-for="school in schoolList" :key="school.schoolId" :label="school.schoolName" :value="school.schoolId"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item prop="semesterId" label="所属学期">
+        <el-select v-model="dataForm.semesterId" placeholder="若不选择则默认最新学期" clearable>
+          <el-option v-for="semester in semesterList" :key="semester.id" :label="semester.semesterName" :value="semester.id"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="学号（姓名）" prop="studentNo" v-if="dataForm.id == ''">
         <!--去掉multiple为单选 , clearable重置, @blur下拉框失去焦点后执行该函数-->
         <el-select v-model="dataForm.studentNo" placeholder="选择学生" clearable @blur="resetStudentList" @change="updateStudentName">
@@ -136,9 +144,10 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref} from "vue";
+import { reactive, ref, toRefs } from "vue";
 import baseService from "@/service/baseService";
-import {ElMessage} from "element-plus";
+import { ElMessage } from "element-plus";
+import useView from "@/hooks/useView";
 
 const emit = defineEmits(["refreshDataList"]);
 
@@ -146,152 +155,103 @@ const visible = ref(false);
 const dataFormRef = ref();
 const searchInput = ref("");
 const studentList = ref<any[]>([]);
+const semesterList = ref<any[]>([]);
 const originalStudentList = ref<any[]>([]); //原始的学生列表，没有查询到匹配的学号或姓名，可以通过这个列表重置学生列表
 const dataForm = reactive({
-  id: '',
-  schoolId: '',
-  studentNo: '',
-  studentName: '',
-  characterEthics: '',
-  rewardsPunishments: '',
-  moralEducationCourses: '',
-  practicalActivities: '',
-  onlineCulture: '',
-  interpersonalRelationships: '',
-  prepManagement: '',
-  planManagement: '',
-  classroomBehavior: '',
-  classroomAttendance: '',
-  homeworkManagement: '',
-  reviewManagement: '',
-  personalAbilities: '',
-  academicPerformance: '',
-  experimentalCompetitions: '',
-  examinationMetrics: '',
-  physicalFitnessScores: '',
-  sportingSpecialties: '',
-  healthyLiving: '',
-  mentalQualities: '',
-  physicalEducationCourses: '',
-  artsCourses: '',
-  artsAchievements: '',
-  artsActivities: '',
-  laborPractices: '',
-  laborCourses: '',
-  comprehensiveScore: '',
-  academicLevel: ''
+  id: "",
+  schoolId: "",
+  semesterId: "",
+  studentNo: "",
+  studentName: "",
+  characterEthics: "",
+  rewardsPunishments: "",
+  moralEducationCourses: "",
+  practicalActivities: "",
+  onlineCulture: "",
+  interpersonalRelationships: "",
+  prepManagement: "",
+  planManagement: "",
+  classroomBehavior: "",
+  classroomAttendance: "",
+  homeworkManagement: "",
+  reviewManagement: "",
+  personalAbilities: "",
+  academicPerformance: "",
+  experimentalCompetitions: "",
+  examinationMetrics: "",
+  physicalFitnessScores: "",
+  sportingSpecialties: "",
+  healthyLiving: "",
+  mentalQualities: "",
+  physicalEducationCourses: "",
+  artsCourses: "",
+  artsAchievements: "",
+  artsActivities: "",
+  laborPractices: "",
+  laborCourses: "",
+  comprehensiveScore: "",
+  academicLevel: ""
 });
+const schoolList = ref<any[]>([]);
+const state = reactive({ ...useView(dataForm), ...toRefs(dataForm) });
+const hasSchoolListPermission = state.hasPermission("sys:school:list");
 
 const rules = ref({
-  weightId: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  studentNo: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  studentName: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  characterEthics: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  rewardsPunishments: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  moralEducationCourses: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  practicalActivities: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  onlineCulture: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  interpersonalRelationships: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  prepManagement: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  planManagement: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  classroomBehavior: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  classroomAttendance: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  homeworkManagement: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  reviewManagement: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  personalAbilities: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  academicPerformance: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  experimentalCompetitions: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  examinationMetrics: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  physicalFitnessScores: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  sportingSpecialties: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  healthyLiving: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  mentalQualities: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  physicalEducationCourses: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  artsCourses: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  artsAchievements: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  artsActivities: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  laborPractices: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  laborCourses: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  comprehensiveScore: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ],
-  academicLevel: [
-    {required: true, message: '必填项不能为空', trigger: 'blur'}
-  ]
+  weightId: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  studentNo: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  studentName: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  characterEthics: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  rewardsPunishments: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  moralEducationCourses: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  practicalActivities: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  onlineCulture: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  interpersonalRelationships: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  prepManagement: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  planManagement: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  classroomBehavior: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  classroomAttendance: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  homeworkManagement: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  reviewManagement: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  personalAbilities: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  academicPerformance: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  experimentalCompetitions: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  examinationMetrics: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  physicalFitnessScores: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  sportingSpecialties: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  healthyLiving: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  mentalQualities: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  physicalEducationCourses: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  artsCourses: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  artsAchievements: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  artsActivities: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  laborPractices: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  laborCourses: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  comprehensiveScore: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
+  academicLevel: [{ required: true, message: "必填项不能为空", trigger: "blur" }]
 });
 
 const init = (id?: number) => {
   visible.value = true;
   dataForm.id = "";
   dataForm.studentNo = "";
+  dataForm.semesterId = "";
+  dataForm.schoolId = "";
 
   // 重置表单数据
   if (dataFormRef.value) {
     dataFormRef.value.resetFields();
   }
 
+  getStudentList();
   if (id) {
     getInfo(id);
+    getSemesterList();
   }
-  getStudentList();
+  if (hasSchoolListPermission) {
+    getSchoolList();
+  } else {
+    getSemesterList();
+  }
 };
 
 // 获取信息
@@ -300,7 +260,12 @@ const getInfo = (id: number) => {
     Object.assign(dataForm, res.data);
   });
 };
-
+// 获取学校列表
+const getSchoolList = () => {
+  return baseService.get("/sys/school/list").then((res) => {
+    schoolList.value = res.data;
+  });
+};
 // 获取学生列表
 const getStudentList = () => {
   return baseService.get("/sys/user/student").then((res) => {
@@ -308,7 +273,16 @@ const getStudentList = () => {
     originalStudentList.value = res.data;
   });
 };
-
+// 获取学期列表
+const getSemesterList = () => {
+  let schoolId = "";
+  if (dataForm.schoolId != "") {
+    schoolId = dataForm.schoolId;
+  }
+  return baseService.get("/sys/semester/list", { schoolId }).then((res) => {
+    semesterList.value = res.data;
+  });
+};
 const handleSearch = () => {
   // 在这里过滤学生列表
   const keyword = searchInput.value.toLowerCase();
@@ -336,7 +310,6 @@ const resetStudentList = () => {
   studentList.value = originalStudentList.value;
 };
 
-
 // 表单提交
 const dataFormSubmitHandle = () => {
   dataFormRef.value.validate((valid: boolean) => {
@@ -345,7 +318,7 @@ const dataFormSubmitHandle = () => {
     }
     (!dataForm.id ? baseService.post : baseService.put)("/analysis/wuyuscore", dataForm).then((res) => {
       ElMessage.success({
-        message: '成功',
+        message: "成功",
         duration: 500,
         onClose: () => {
           visible.value = false;

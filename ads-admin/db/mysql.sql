@@ -34,6 +34,53 @@ CREATE TABLE sys_school (
     key idx_create_date (create_date)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学校管理';
 
+
+-- 学校学期表
+CREATE TABLE sys_school_semester (
+      id bigint PRIMARY KEY COMMENT 'id',
+      school_id BIGINT NOT NULL COMMENT '学校ID',
+      semester_name VARCHAR(255) NOT NULL COMMENT '学期名称',
+      start_date DATE NOT NULL COMMENT '开始日期',
+      end_date DATE NOT NULL COMMENT '结束日期',
+      remark varchar(100) COMMENT '备注',
+      create_date datetime COMMENT '创建时间',
+      key idx_create_date (create_date)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='学期管理';
+
+-- 学校年级表
+CREATE TABLE sys_school_grade (
+    id bigint PRIMARY KEY COMMENT 'id',
+    school_id BIGINT NOT NULL COMMENT '学校ID',
+    grade_name VARCHAR(255) NOT NULL COMMENT '年级名称',
+    remark varchar(100) COMMENT '备注',
+    create_date datetime COMMENT '创建时间',
+    key idx_create_date (create_date)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='年级管理';
+
+-- 学校班级表
+CREATE TABLE sys_school_class (
+    id bigint PRIMARY KEY COMMENT 'id',
+    school_id BIGINT NOT NULL COMMENT '学校ID',
+    grade_id BIGINT NOT NULL COMMENT '年级ID',
+    class_name VARCHAR(255) NOT NULL COMMENT '班级名称',
+    remark varchar(100) COMMENT '备注',
+    create_date datetime COMMENT '创建时间',
+    key idx_grade_id (grade_id),
+    key idx_create_date (create_date)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='班级管理';
+
+-- 班级-用户表
+CREATE TABLE sys_user_class (
+    id bigint PRIMARY KEY COMMENT 'id',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    grade_id BIGINT NOT NULL COMMENT '班级ID',
+    create_date datetime COMMENT '创建时间',
+    key idx_grade_id (grade_id),
+    key idx_user_id (user_id),
+    key idx_create_date (create_date)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='班级管理';
+
+
 -- 五育-权重表 每个学校只有一个权重设置
 CREATE TABLE wuyu_weight (
    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
@@ -74,10 +121,14 @@ CREATE TABLE wuyu_weight (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='五育设置（五育权重表）';
 
 
--- 五育分析
+-- 五育分析 （因为该记录是有时效性的，即学生的年级班级会变，但记录保留，所以字段上加入学期、年级、班级，）
 CREATE TABLE wuyu_score (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
-    school_id BIGINT unique NOT NULL COMMENT '学校ID',
+    school_id BIGINT NOT NULL COMMENT '学校ID',
+    semester_id BIGINT NOT NULL COMMENT '学期ID',
+    grade_id BIGINT NOT NULL COMMENT '年级ID',
+    class_id BIGINT NOT NULL COMMENT '班级ID',
+    report_id BIGINT NOT NULL COMMENT '报告ID',
     student_no varchar(50) NOT NULL COMMENT '学生学号',
     student_name varchar(100) NOT NULL COMMENT '学生姓名',
     character_ethics INT NOT NULL COMMENT '品德评定',
@@ -112,6 +163,9 @@ CREATE TABLE wuyu_score (
     create_date datetime COMMENT '创建时间',
     INDEX idx_student_name (student_name),
     INDEX idx_student_no (student_no),
+    INDEX idx_semester_id (semester_id),
+    INDEX idx_grade_id(grade_id),
+    INDEX idx_class_id (class_id),
     key idx_create_date (create_date),
     key idx_school_id (school_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='五育分析（五育成绩表）';
@@ -120,10 +174,10 @@ CREATE TABLE wuyu_score (
 CREATE TABLE wuyu_analysis_result (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
     class_id BIGINT unique COMMENT '班级ID',
-    score_id BIGINT unique COMMENT '五育成绩ID',
-    student_no varchar(50) unique COMMENT '学生学号',
+    score_id BIGINT COMMENT '五育成绩ID',
+    student_no varchar(50) COMMENT '学生学号',
     student_name varchar(100) COMMENT '学生姓名',
-    response varchar(1000) NOT NULL COMMENT '诊断结果',
+    response varchar(1000) COMMENT '诊断结果',
 
     create_date datetime COMMENT '创建时间',
     INDEX idx_student_name (student_name),

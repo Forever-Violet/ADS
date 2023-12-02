@@ -20,7 +20,7 @@
       "@/*": ["src/*"]
     },
     "compilerOptions": {
-      "types": ["vite-plugin-svg-icons/client"]
+      "types": ["vite-plugin-svg-icons/client", "chart.js"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

@@ -16,6 +16,7 @@ import java.util.Date;
 @Data
 @TableName("wuyu_score")
 public class WuyuScoreEntity {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 主键
@@ -25,6 +26,22 @@ public class WuyuScoreEntity {
      * 学校id
      */
 	private Long schoolId;
+    /**
+     * 学期id
+     */
+	private Long semesterId;
+    /**
+     * 年级id
+     */
+	private Long gradeId;
+    /**
+     * 班级id
+     */
+	private Long classId;
+    /**
+     * 诊断报告id
+     */
+    private Long reportId;
     /**
      * 学生学号
      */

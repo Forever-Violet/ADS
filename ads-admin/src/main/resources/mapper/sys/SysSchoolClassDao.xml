@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.ads.modules.sys.dao.SysSchoolClassDao">
+
+    <resultMap type="io.ads.modules.sys.entity.SysSchoolClassEntity" id="sysSchoolClassMap">
+        <result property="id" column="id"/>
+        <result property="schoolId" column="school_id"/>
+        <result property="gradeId" column="grade_id"/>
+        <result property="className" column="class_name"/>
+        <result property="remark" column="remark"/>
+        <result property="createDate" column="create_date"/>
+    </resultMap>
+    <select id="getList" resultType="io.ads.modules.sys.entity.SysSchoolClassEntity">
+        select t1.*,
+               (select t2.school_name from sys_school t2 where t2.school_id=t1.school_id) schoolName,
+               (select t3.grade_name from sys_school_grade t3 where t3.id=t1.grade_id) gradeName
+               from sys_school_class t1
+        where 1=1
+        <if test="schoolId != null and schoolId.trim() != ''">
+            and t1.school_id = #{schoolId}
+        </if>
+        <if test="gradeId != null and gradeId.trim() != ''">
+            and t1.grade_id = #{gradeId}
+        </if>
+    </select>
+    <select id="getClassIdByStudentNo" resultType="java.lang.Long">
+        select t1.id from sys_school_class t1
+          inner join sys_user_class t2 on t1.id = t2.class_id
+          inner join sys_user t3 on t2.user_id = t3.id
+        where t3.username = #{value}
+    </select>
+
+
+</mapper>

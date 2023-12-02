@@ -7,8 +7,7 @@
       </ul>
       <h3>获取帮助</h3>
       <ul>
-        <li>官方社区：<a href="https://www.renren.io/community" target="_blank">https://www.renren.io/community</a></li>
-        <li>Git地址：<a href="https://gitee.com/renrenio/renren-security" target="_blank">https://gitee.com/renrenio/renren-security</a></li>
+        <li>Github地址：<a href="https://github.com/Forever-Violet/ADS" target="_blank">https://github.com/Forever-Violet/ADS</a></li>
         <li>如需关注项目最新动态，请Watch、Star项目，同时也是对项目最好的支持</li>
       </ul>
     </div>

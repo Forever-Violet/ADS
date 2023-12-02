@@ -17,7 +17,7 @@
         <el-button v-if="hasSchoolListPermission" @click="state.getDataList()">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-table v-loading="state.dataListLoading" :data="state.dataList" border @selection-change="state.dataListSelectionChangeHandle" style="width: 100%">
+    <el-table v-loading="state.dataListLoading" :data="state.dataList" border @selection-change="state.dataListSelectionChangeHandle" @sort-change="state.dataListSortChangeHandle" style="width: 100%">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
               <el-table-column prop="topic" label="所属五育" header-align="center" align="center">
                 <template v-slot="scope">

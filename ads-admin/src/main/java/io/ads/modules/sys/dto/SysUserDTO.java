@@ -90,6 +90,12 @@ public class SysUserDTO implements Serializable {
 	@ApiModelProperty(value = "角色名称列表")
 	private List<String> roleNameList;
 
+	@ApiModelProperty(value = "班级ID列表")
+	private List<Long> classIdList;
+
+	@ApiModelProperty(value = "班级名称列表")
+	private List<String> classNameList;
+
 	@ApiModelProperty(value = "学校名称")
 	private String schoolName;
 

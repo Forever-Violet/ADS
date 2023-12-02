@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.ads.modules.sys.dao.SysSchoolGradeDao">
+
+    <resultMap type="io.ads.modules.sys.entity.SysSchoolGradeEntity" id="sysSchoolGradeMap">
+        <result property="id" column="id"/>
+        <result property="schoolId" column="school_id"/>
+        <result property="gradeName" column="grade_name"/>
+        <result property="remark" column="remark"/>
+        <result property="createDate" column="create_date"/>
+    </resultMap>
+
+    <select id="getGradeIdByStudentNo" resultType="java.lang.Long">
+        select t1.id from sys_school_grade t1
+       inner join sys_school_class t2 on t1.id = t2.grade_id
+       inner join sys_user_class t3 on t2.id = t3.class_id
+       inner join sys_user t4 on t3.user_id = t4.id
+        where t4.username = #{value}
+    </select>
+
+
+</mapper>

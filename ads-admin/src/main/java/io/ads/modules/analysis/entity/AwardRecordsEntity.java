@@ -17,6 +17,8 @@ import java.util.Date;
 @TableName("award_records")
 public class AwardRecordsEntity {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * 主键
      */

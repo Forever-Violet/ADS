@@ -39,10 +39,19 @@ public interface SysUserDao extends BaseDao<SysUserEntity> {
 	int getCountBySchoolId(Long schoolId);
 
 	/**
-	 * 根据学校ID,查询学校ID列表
+	 * 根据学校ID,查询用户ID列表
 	 */
 	List<Long> getUserIdListBySchoolId(List<Long> schoolIdList);
 
+	/**
+	 * 根据年级id 查询用户学号（用户名）列表
+	 */
+	List<Long> getStudentNoListByGradeId(Long gradeId);
+
+	/**
+	 * 根据班级id，查询学生学号（用户名）列表
+	 */
+	List<Long> getStudentNoListByClassId(Long classId);
 	/**
 	 * 获取学生列表
 	 */

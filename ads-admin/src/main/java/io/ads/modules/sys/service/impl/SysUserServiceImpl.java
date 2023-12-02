@@ -19,11 +19,13 @@ import io.ads.modules.security.user.SecurityUser;
 import io.ads.modules.security.user.UserDetail;
 import io.ads.modules.sys.dao.SysUserDao;
 import io.ads.modules.sys.dto.SysUserDTO;
+import io.ads.modules.sys.entity.SysUserClassEntity;
 import io.ads.modules.sys.entity.SysUserEntity;
 import io.ads.modules.sys.enums.SuperAdminEnum;
 import io.ads.modules.sys.service.SysSchoolService;
 
 import io.ads.modules.sys.service.SysRoleUserService;
+import io.ads.modules.sys.service.SysUserClassService;
 import io.ads.modules.sys.service.SysUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -45,6 +47,7 @@ import java.util.*;
 public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntity> implements SysUserService {
     private final SysRoleUserService sysRoleUserService;
     private final SysSchoolService sysSchoolService;
+    private final SysUserClassService sysUserClassService;
 
 
     @Override
@@ -79,6 +82,12 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
             sysUserDTO.setRoleIdList(roleIdList);
             // 填充角色名称列表
             sysUserDTO.setRoleNameList(sysRoleUserService.getRoleNameList(roleIdList));
+
+            List<Long> classIdList = sysUserClassService.getClassIdList(entity.getId());
+            // 填充班级id列表
+            sysUserDTO.setClassIdList(classIdList);
+            // 填充班级名称列表
+            sysUserDTO.setClassNameList(sysUserClassService.getClassNameList(classIdList));
             dtoList.add(sysUserDTO);
         });
         return dtoList;
@@ -96,8 +105,16 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     @Override
     public SysUserDTO get(Long id) {
         SysUserEntity entity = baseDao.getById(id);
+        SysUserDTO dto = new SysUserDTO();
+        dto = ConvertUtils.sourceToTarget(entity, SysUserDTO.class);
+        //用户角色列表
+        List<Long> roleIdList = sysRoleUserService.getRoleIdList(id);
+        dto.setRoleIdList(roleIdList);
 
-        return ConvertUtils.sourceToTarget(entity, SysUserDTO.class);
+        //用户班级列表
+        List<Long> classIdList = sysUserClassService.getClassIdList(id);
+        dto.setClassIdList(classIdList);
+        return dto;
     }
 
     @Override
@@ -129,6 +146,8 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
 
         //保存角色用户关系
         sysRoleUserService.saveOrUpdate(entity.getId(), dto.getRoleIdList());
+        //保存班级用户关系
+        sysUserClassService.saveOrUpdate(entity.getId(), dto.getClassIdList());
     }
 
     @Override
@@ -149,6 +168,8 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
 
         //更新角色用户关系
         sysRoleUserService.saveOrUpdate(entity.getId(), dto.getRoleIdList());
+        //更新班级用户关系
+        sysUserClassService.saveOrUpdate(entity.getId(), dto.getClassIdList());
     }
 
     @Override
@@ -158,6 +179,8 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
 
         //删除角色用户关系
         sysRoleUserService.deleteByUserIds(ids);
+        //删除班级用户关系
+        sysUserClassService.deleteByUserIds(ids);
     }
 
     @Override

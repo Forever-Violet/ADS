@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.ads.modules.sys.dao.SysSchoolSemesterDao">
+
+    <resultMap type="io.ads.modules.sys.entity.SysSchoolSemesterEntity" id="sysSchoolSemesterMap">
+        <result property="id" column="id"/>
+        <result property="schoolId" column="school_id"/>
+        <result property="semesterName" column="semester_name"/>
+        <result property="remark" column="remark"/>
+        <result property="createDate" column="create_date"/>
+    </resultMap>
+
+
+</mapper>

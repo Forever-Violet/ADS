@@ -79,7 +79,7 @@ public class WuyuScoreExcel {
     private Integer comprehensiveScore;
     @ExcelProperty(value = "综合等级", converter = LevelConverter.class)
     private Integer comprehensiveLevel;
-    @ExcelProperty(value = "综合等级", converter = LevelConverter.class)
+    @ExcelProperty(value = "学业等级", converter = LevelConverter.class)
     private Integer academicLevel;
 
 }

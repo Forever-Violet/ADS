@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.ads.modules.sys.dao.SysUserClassDao">
+
+    <resultMap type="io.ads.modules.sys.entity.SysUserClassEntity" id="sysUserClassMap">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="classId" column="class_id"/>
+        <result property="createDate" column="create_date"/>
+    </resultMap>
+    <delete id="deleteByClassIds">
+        delete from sys_user_class where class_id in
+        <foreach item="classId" collection="array" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </delete>
+    <delete id="deleteByUserIds">
+        delete from sys_user_class where user_id in
+        <foreach item="userId" collection="array" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+    <select id="getClassIdList" resultType="java.lang.Long">
+        select class_id from sys_user_class where user_id = #{value}
+    </select>
+    <select id="getClassNameById" resultType="java.lang.String">
+        select class_name from sys_school_class where id = #{value}
+    </select>
+    <select id="getGradeNameById" resultType="java.lang.String">
+        select t1.grade_name from sys_school_grade t1
+        join sys_school_class t2 on t1.id = t2.grade_id
+        where t2.id = #{value}
+        group by t1.grade_name
+    </select>
+
+
+</mapper>

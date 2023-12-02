@@ -1,5 +1,6 @@
 package io.ads.modules.analysis.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mchange.lang.IntegerUtils;
@@ -21,6 +22,9 @@ import io.ads.modules.security.user.SecurityUser;
 import io.ads.modules.security.user.UserDetail;
 import io.ads.modules.sys.dto.SysUserDTO;
 import io.ads.modules.sys.enums.SuperAdminEnum;
+import io.ads.modules.sys.service.SysSchoolClassService;
+import io.ads.modules.sys.service.SysSchoolGradeService;
+import io.ads.modules.sys.service.SysSchoolSemesterService;
 import io.ads.modules.sys.service.SysUserService;
 import io.swagger.models.auth.In;
 import org.springframework.beans.BeanUtils;
@@ -32,7 +36,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,8 +57,15 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
     @Autowired
     WuyuAnalysisResultDao wuyuAnalysisResultDao;
     @Autowired
-    RestTemplate restTemplate;
+    SysSchoolSemesterService sysSchoolSemesterService;
+    @Autowired
+    SysSchoolGradeService sysSchoolGradeService;
+    @Autowired
+    SysSchoolClassService sysSchoolClassService;
 
+    @Autowired
+    RestTemplate restTemplate;
+    // 分析接口
     private final String ANALYSIS_URL = "https://chatglm2.tocmcc.cn:443";
 
 
@@ -60,13 +73,31 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
     public QueryWrapper<WuyuScoreEntity> getWrapper(Map<String, Object> params){
         String id = (String)params.get("id");
         String schoolId = (String)params.get("schoolId");
+        String semesterId = (String)params.get("semesterId");
+        String gradeId = (String)params.get("gradeId");
+        String classId = (String)params.get("classId");
         String comprehensiveLevel = (String)params.get("comprehensiveLevel");
         String studentNameOrNo = (String)params.get("studentNameOrNo");
+
+        // 任教年级列表，（针对老师）
+        List<Long> gradeList = new ArrayList<>();
+
+        // 普通用户或普通管理员，在这里填充其学校id
+        UserDetail user = SecurityUser.getUser();
+        if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
+            schoolId = user.getSchoolId().toString();
+            gradeList = sysSchoolGradeService.getGradeIdListByStudentNo(user.getUsername());
+        }
+
 
         QueryWrapper<WuyuScoreEntity> wrapper = new QueryWrapper<>();
         wrapper.eq(StrUtil.isNotBlank(id), "id", id)
                 .eq(StrUtil.isNotBlank(schoolId), "school_id", schoolId)
                 .eq(StrUtil.isNotBlank(comprehensiveLevel), "comprehensive_level", comprehensiveLevel)
+                .eq(StrUtil.isNotBlank(semesterId), "semester_id", semesterId)
+                .eq(StrUtil.isNotBlank(gradeId), "grade_id", gradeId)
+                .eq(StrUtil.isNotBlank(classId), "class_id", classId)
+                .in(!gradeList.isEmpty(), "grade_id", gradeList) //任教年级列表
                 .like(StrUtil.isNotBlank(studentNameOrNo), "student_name", studentNameOrNo)
                 .or()
                 .like(StrUtil.isNotBlank(studentNameOrNo), "student_no", studentNameOrNo);
@@ -77,19 +108,64 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
 
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void save(WuyuScoreDTO dto) {
 
         dto = calComprehensiveScoreAndLevel(dto);
         // todo 学业等级怎么确定待商榷，先固定
         dto.setAcademicLevel(1);
 
-        super.save(dto);
+        WuyuScoreEntity entity = new WuyuScoreEntity();
+        BeanUtils.copyProperties(dto, entity);
+        // 填充 学期id
+        if (entity.getSemesterId() == null) { //如果学期id为空
+            // 查询 该学校当前最新的学期，默认按最新学期填入
+            entity.setSemesterId(sysSchoolSemesterService.getLatestSemesterId(entity.getSchoolId()));
+            //System.out.println("空了----------------");
+        }
+        // 填充 年级id，根据学号
+        entity.setGradeId(sysSchoolGradeService.getGradeIdListByStudentNo(entity.getStudentNo()).get(0));
+        // 填充 班级id, 根据学号
+        entity.setClassId(sysSchoolClassService.getClassIdByStudentNo(entity.getStudentNo()));
+
+        // 填充 报告id
+        // 直接插入一个没有诊断内容的报告，等到用户点击个人诊断报告时再生成具体的报告
+        WuyuAnalysisResultEntity reportEntity = new WuyuAnalysisResultEntity();
+        // 填入学号和姓名
+        reportEntity.setStudentNo(entity.getStudentNo());
+        reportEntity.setStudentName(entity.getStudentName());
+        wuyuAnalysisResultDao.insert(reportEntity);
+
+        // 会返回报告id，以此来绑定 分数记录和报告记录
+        entity.setReportId(reportEntity.getId());
+
+        // 插入 五育分数记录
+        super.insert(entity);
+
+        // 更新诊断报告记录，诊断报告 关联 五育分数id，
+        reportEntity.setScoreId(entity.getId());
+        wuyuAnalysisResultDao.updateById(reportEntity);
+
     }
 
     @Override
     public void update(WuyuScoreDTO dto) {
         super.update(calComprehensiveScoreAndLevel(dto));
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long[] ids) {
+        // 先根据五育分数id关联的诊断报告id，删除个人诊断报告
+        for (Long id : ids) {
+            Long reportId = baseDao.getReportIdByScoreId(id);
+            // 根据报告id删除报告记录
+            LambdaQueryWrapper<WuyuAnalysisResultEntity> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(WuyuAnalysisResultEntity::getId, reportId);
+            wuyuAnalysisResultDao.delete(wrapper);
+        }
+
+        super.delete(ids);
     }
 
     // 计算综合成绩和等级，新增和修改都用到，所以抽出来
@@ -212,6 +288,7 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
 
     // 根据 五育分数 id 重新生成 个人诊断报告
     @Override
+    @Transactional
     public void reGenAnalysisReport(Long id) {
         // 根据五育分数id 查询 五育诊断报告是否已存在
         LambdaQueryWrapper<WuyuAnalysisResultEntity> lqw = new LambdaQueryWrapper<>();
@@ -228,7 +305,9 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
             // 更新 报告内容
             reportEntity.setResponse(genAnalysisReport(scoreDto).getResponse());
             // 更新 自动根据报告id更新
-            wuyuAnalysisResultDao.update(reportEntity, new LambdaQueryWrapper<>());
+            wuyuAnalysisResultDao.update(reportEntity, new LambdaQueryWrapper<WuyuAnalysisResultEntity>()
+                    .eq(WuyuAnalysisResultEntity::getId, reportEntity.getId())
+            );
         }
     }
 
@@ -239,7 +318,9 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         StringBuilder evaluatePrompt = new StringBuilder("该生 类型#个人评价*");
         StringBuilder suggestPrompt = new StringBuilder("该生 类型#个人建议*");
 
-        String prompt = evaluatePrompt.append(createPrompt(dto)).toString();
+        String prompt = evaluatePrompt.append(createPrompt(dto))
+                .append("，输出评价或建议不少于200字")
+                .toString();
         System.out.println("========================================" + prompt);
         requestBody.put("prompt", prompt);
 

@@ -5,7 +5,6 @@
 
     <resultMap type="io.ads.modules.analysis.entity.WuyuScoreEntity" id="wuyuScoreMap">
         <result property="id" column="id"/>
-        <result property="weightId" column="weight_id"/>
         <result property="studentNo" column="student_no"/>
         <result property="studentName" column="student_name"/>
         <result property="characterEthics" column="character_ethics"/>
@@ -37,6 +36,9 @@
         <result property="comprehensiveScore" column="comprehensive_score"/>
         <result property="academicLevel" column="academic_level"/>
     </resultMap>
+    <select id="getReportIdByScoreId" resultType="java.lang.Long">
+        select report_id from wuyu_score where id = #{scoreId}
+    </select>
 
 
 </mapper>

@@ -16,6 +16,7 @@ import io.ads.modules.sys.dao.SysRoleUserDao;
 import io.ads.modules.sys.entity.SysRoleUserEntity;
 import io.ads.modules.sys.service.SysRoleUserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.List;
 /**
  * 角色用户关系
  *
- * @author Mark sunlightcs@gmail.com
+ * @author Mark
  * @since 1.0.0
  */
 @Service

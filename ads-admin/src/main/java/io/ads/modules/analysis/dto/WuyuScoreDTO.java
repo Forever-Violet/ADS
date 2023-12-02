@@ -29,6 +29,18 @@ public class WuyuScoreDTO implements Serializable {
 	@ApiModelProperty(value = "学校id")
 	private Long schoolId;
 
+	@ApiModelProperty(value = "学期id")
+	private Long semesterId;
+
+	@ApiModelProperty(value = "年级id")
+	private Long gradeId;
+
+	@ApiModelProperty(value = "班级id")
+	private Long classId;
+
+	@ApiModelProperty(value = "诊断报告id")
+	private Long reportId;
+
 	@ApiModelProperty(value = "学生学号")
 	private String studentNo;
 

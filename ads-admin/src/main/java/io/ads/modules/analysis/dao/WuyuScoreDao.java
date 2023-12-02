@@ -12,5 +12,9 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface WuyuScoreDao extends BaseDao<WuyuScoreEntity> {
-	
+
+    /**
+     * 根据五育分数id获取关联的个人诊断报告id
+     */
+    Long getReportIdByScoreId(Long id);
 }

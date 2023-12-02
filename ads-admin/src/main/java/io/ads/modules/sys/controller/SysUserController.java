@@ -89,9 +89,6 @@ public class SysUserController {
     public Result<SysUserDTO> get(@PathVariable("id") Long id) {
         SysUserDTO data = sysUserService.get(id);
 
-        //用户角色列表
-        List<Long> roleIdList = sysRoleUserService.getRoleIdList(id);
-        data.setRoleIdList(roleIdList);
 
         return new Result<SysUserDTO>().ok(data);
     }
