@@ -4,6 +4,10 @@ import io.ads.common.service.CrudService;
 import io.ads.modules.analysis.dto.WuyuAnalysisResultDTO;
 import io.ads.modules.analysis.dto.WuyuScoreDTO;
 import io.ads.modules.analysis.entity.WuyuScoreEntity;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * 五育分析（五育成绩表）
@@ -28,4 +32,10 @@ public interface WuyuScoreService extends CrudService<WuyuScoreEntity, WuyuScore
      * @param id 五育分数id
      */
     void reGenAnalysisReport(Long id);
+
+    /**
+     * 读取Excel文件中的数据并保存到数据库
+     * @param file Excel文件
+     */
+    Map<String, Object> readExcel(MultipartFile file) throws IOException;
 }

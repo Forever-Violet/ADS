@@ -1,11 +1,14 @@
 package io.ads.modules.analysis.service.impl;
 
 import cn.hutool.core.date.DateTime;
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mchange.lang.IntegerUtils;
 import io.ads.common.exception.RenException;
 import io.ads.common.service.impl.CrudServiceImpl;
+import io.ads.common.utils.ConvertUtils;
+import io.ads.common.utils.ExcelUtils;
 import io.ads.modules.analysis.dao.WuyuAnalysisResultDao;
 import io.ads.modules.analysis.dao.WuyuScoreDao;
 import io.ads.modules.analysis.dto.WuyuAnalysisResultDTO;
@@ -14,6 +17,9 @@ import io.ads.modules.analysis.dto.WuyuWeightDTO;
 import io.ads.modules.analysis.entity.WuyuAnalysisResultEntity;
 import io.ads.modules.analysis.entity.WuyuScoreEntity;
 import io.ads.modules.analysis.entity.WuyuWeightEntity;
+import io.ads.modules.analysis.excel.WuyuScoreExcel;
+import io.ads.modules.analysis.excel.WuyuScoreImportExcel;
+import io.ads.modules.analysis.excel.listener.WuyuScoreReadListener;
 import io.ads.modules.analysis.service.WuyuAnalysisResultService;
 import io.ads.modules.analysis.service.WuyuScoreService;
 import cn.hutool.core.util.StrUtil;
@@ -27,6 +33,7 @@ import io.ads.modules.sys.service.SysSchoolGradeService;
 import io.ads.modules.sys.service.SysSchoolSemesterService;
 import io.ads.modules.sys.service.SysUserService;
 import io.swagger.models.auth.In;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -35,11 +42,16 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * 五育分析（五育成绩表）
@@ -62,7 +74,10 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
     SysSchoolGradeService sysSchoolGradeService;
     @Autowired
     SysSchoolClassService sysSchoolClassService;
-
+    /**
+    //@Autowired
+    //WuyuScoreServiceImpl scoreServiceProxy; // 代理对象，用来在本类中执行事务方法，但这样会出现循环依赖，spring2.6后默认不允许这样，所以还是使用AopContext来获取代理对象
+    **/
     @Autowired
     RestTemplate restTemplate;
     // 分析接口
@@ -115,6 +130,7 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         // todo 学业等级怎么确定待商榷，先固定
         dto.setAcademicLevel(1);
 
+        // todo 每个学生一学期只有一个诊断报告，这个待定
         WuyuScoreEntity entity = new WuyuScoreEntity();
         BeanUtils.copyProperties(dto, entity);
         // 填充 学期id
@@ -251,10 +267,8 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
 
         WuyuAnalysisResultDTO reportDto = new WuyuAnalysisResultDTO();
 
-        // 根据五育分数id查询 五育诊断报告是否已存在
-        LambdaQueryWrapper<WuyuAnalysisResultEntity> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(WuyuAnalysisResultEntity::getScoreId, id);
-        WuyuAnalysisResultEntity reportEntity = wuyuAnalysisResultDao.selectOne(lqw);
+        // 根据五育分数id查询 五育诊断报告
+        WuyuAnalysisResultEntity reportEntity = getReportByScoreId(id);
         if (reportEntity == null) {
             // 如果不存在报告，那么生成
             // 先根据五育分数id 获取五育分数
@@ -276,6 +290,13 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
             reportDto.setScoreId(id);
             reportDto.setStudentNo(wuyuScoreDTO.getStudentNo());
             reportDto.setStudentName(wuyuScoreDTO.getStudentName());
+        } else if (reportEntity.getResponse() == null) {  // 或 报告的内容为空，那么重新生成（修改而不是插入）
+            // 代理对象
+            WuyuScoreServiceImpl currentProxy = (WuyuScoreServiceImpl)AopContext.currentProxy();
+            currentProxy.reGenAnalysisReport(id);
+            // 再次查询，填充报告内容
+            reportEntity = getReportByScoreId(id);
+            BeanUtils.copyProperties(reportEntity, reportDto);
         } else {
             // 如果存在直接返回
             BeanUtils.copyProperties(reportEntity, reportDto);
@@ -285,19 +306,20 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
 
     }
 
+    //根据五育分数id 查询 五育诊断报告
+    private WuyuAnalysisResultEntity getReportByScoreId(Long id) {
+        LambdaQueryWrapper<WuyuAnalysisResultEntity> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(WuyuAnalysisResultEntity::getScoreId, id);
+        return wuyuAnalysisResultDao.selectOne(lqw);
+    }
 
     // 根据 五育分数 id 重新生成 个人诊断报告
     @Override
     @Transactional
     public void reGenAnalysisReport(Long id) {
-        // 根据五育分数id 查询 五育诊断报告是否已存在
-        LambdaQueryWrapper<WuyuAnalysisResultEntity> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(WuyuAnalysisResultEntity::getScoreId, id);
-        WuyuAnalysisResultEntity reportEntity = wuyuAnalysisResultDao.selectOne(lqw);
+        WuyuAnalysisResultEntity reportEntity = getReportByScoreId(id);
         if (reportEntity == null) { //如果不存在，直接调用 生成函数
-
             genOrGetAnalysisReport(id);
-
         } else {
             // 如果存在，才重新生成
             // 查询 五育分数对象
@@ -385,7 +407,79 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         }
     }
 
+    @Override
+    public Map<String, Object> readExcel(MultipartFile file) throws IOException {
+        // 创建一个用于存储读取结果的 Map
+        Map<String, Object> resultMap = new HashMap<>();
+
+        // 获取Excel文件的输入流
+        InputStream inputStream = file.getInputStream();
+
+        // 读取Excel文件内容
+        List<WuyuScoreImportExcel> wuyuScoreExcelList =
+                ExcelUtils.readExcel(inputStream, WuyuScoreImportExcel.class, new WuyuScoreReadListener());
+        /**
+        // 处理成功的记录数
+        int success = 0;
+        // 处理失败的记录数
+        int failed = 0;
+        // 处理数据
+        for (WuyuScoreImportExcel scoreExcel : wuyuScoreExcelList) {
+            // 如果当前行记录的学生学号为空，那么直接跳过
+            // 检查当前行记录的学生是否存在于系统，不存在则直接跳过
+            if (scoreExcel.getStudentNo() == null || sysUserService.getByUsername(scoreExcel.getStudentNo()) == null) {
+                failed++;
+                continue; // 如果不存在，那么直接跳过
+            }
+            WuyuScoreDTO scoreDTO = ConvertUtils.sourceToTarget(scoreExcel, WuyuScoreDTO.class);
+            // 用代理对象执行事务方法，防止事务失效
+            try {
+                scoreServiceProxy.save(scoreDTO);
+            } catch (Exception e) {
+                failed++;
+                // 捕到异常不管，继续执行
+                continue;
+            }
+            // 成功处理记录数加1
+            success++;
+        }*/
+        // 处理成功的记录数 AtomicInteger的incrementAndGet是线程安全的++
+        AtomicInteger success = new AtomicInteger(0);
+        // 处理失败的记录数
+        AtomicInteger failed = new AtomicInteger(0);
+        // 用并行流来过滤无效的记录, 并行流默认使用公共的 ForkJoinPool，默认线程数量是处理器核心数量
+        List<WuyuScoreDTO> validScores = wuyuScoreExcelList.parallelStream()
+                .filter(scoreExcel -> {
+                    if (scoreExcel.getStudentNo() == null || sysUserService.getByUsername(scoreExcel.getStudentNo()) == null) {
+                        // 处理失败记录数+1
+                        failed.incrementAndGet();
+                        return false; // 校验失败，跳过
+                    }
+                    return true;
+                })
+                .map(scoreExcel -> ConvertUtils.sourceToTarget(scoreExcel, WuyuScoreDTO.class))
+                .collect(Collectors.toList());
+        // 代理对象
+        WuyuScoreServiceImpl currentProxy = (WuyuScoreServiceImpl)AopContext.currentProxy();
+        // 有效的记录，直接用并行流进行存储
+        validScores.parallelStream().forEach(scoreDTO -> {
+            try {
+                // 用代理对象执行事务方法，防止事务失效
+                currentProxy.save(scoreDTO);
+                // 处理成功
+                success.incrementAndGet();
+            } catch (Exception e) {
+                // 处理失败的行数加1
+                failed.incrementAndGet();
+                // 捕到异常不管，继续执行
+            }
+        });
+
+        // 将结果添加到map中
+        resultMap.put("failedNum", failed);
+        resultMap.put("successNum", success);
 
 
-
+        return resultMap;
+    }
 }

@@ -12,10 +12,12 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.converters.longconverter.LongStringConverter;
+import com.alibaba.excel.read.listener.ReadListener;
 import org.springframework.beans.BeanUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,6 +72,39 @@ public class ExcelUtils {
         }
 
         exportExcel(response, fileName, sheetName, targetList, targetClass);
+    }
+
+    /**
+     * 从 Excel 文件中读取数据
+     *
+     * @param inputStream Excel 文件的输入流
+     * @param clazz       对应数据的类对象
+     * @param readListener 读取监听器，处理读取过程中的逻辑
+     * @return Excel数据对象的List
+     */
+    public static <T> List<T> readExcel(InputStream inputStream, Class<T> clazz, ReadListener<T> readListener) {
+        return EasyExcel.read(inputStream)
+                .head(clazz)
+                .registerReadListener(readListener)
+                .sheet()
+                .doReadSync();
+    }
+
+    /**
+     * 通过文件名判断是否为excel文件
+     * @param fileName 文件名
+     */
+    public static boolean isExcelFile(String fileName) {
+        return fileName.endsWith(".xls") || fileName.endsWith(".xlsx");
+    }
+
+    /**
+     * 通过MIMETYPE判断是否为excel文件
+     * @param contentType MIMETYPE
+     */
+    public static boolean isValidExcelContentType(String contentType) {
+        return "application/vnd.ms-excel".equals(contentType) ||
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".equals(contentType);
     }
 
 }

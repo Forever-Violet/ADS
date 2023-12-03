@@ -1,7 +1,10 @@
 package io.ads.modules.analysis.controller;
 
+import cn.hutool.core.io.file.FileNameUtil;
 import io.ads.common.annotation.LogOperation;
 import io.ads.common.constant.Constant;
+import io.ads.common.exception.ErrorCode;
+import io.ads.common.exception.RenException;
 import io.ads.common.page.PageData;
 import io.ads.common.utils.ExcelUtils;
 import io.ads.common.utils.Result;
@@ -10,7 +13,10 @@ import io.ads.common.validator.AssertUtils;
 import io.ads.modules.analysis.dto.WuyuAnalysisResultDTO;
 import io.ads.modules.analysis.dto.WuyuScoreDTO;
 import io.ads.modules.analysis.excel.WuyuScoreExcel;
+import io.ads.modules.analysis.excel.WuyuScoreImportExcel;
 import io.ads.modules.analysis.service.WuyuScoreService;
+import io.ads.modules.oss.cloud.OSSFactory;
+import io.ads.modules.oss.entity.SysOssEntity;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -19,12 +25,12 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -142,6 +148,39 @@ public class WuyuScoreController {
         List<WuyuScoreDTO> list = wuyuScoreService.list(params);
 
         ExcelUtils.exportExcelToTarget(response, null, "五育分析（五育成绩表）", list, WuyuScoreExcel.class);
+    }
+
+    @GetMapping("exportTemplate")
+    @ApiOperation("导出空模板")
+    @LogOperation("导出空模板")
+    @RequiresPermissions("analysis:wuyuscore:export")
+    public void exportTemplate(@ApiIgnore @RequestParam Map<String, Object> params, HttpServletResponse response) throws Exception {
+
+
+        ExcelUtils.exportExcelToTarget(response, "五育成绩导入模板", "五育成绩导入模板", new ArrayList<>(), WuyuScoreImportExcel.class);
+    }
+
+
+    @PostMapping("upload")
+    @ApiOperation(value = "上传Excel文件")
+    @RequiresPermissions("analysis:wuyuscore:save")
+    public Result<Map<String, Object>> uploadAndReadExcel(@RequestParam("file") MultipartFile file) throws Exception {
+        // 通过MIME 类型判断是否为excel文件
+        String contentType = file.getContentType();
+        if (!ExcelUtils.isValidExcelContentType(contentType)) {
+            throw new RenException("文件不是有效的Excel格式: " + contentType);
+        }
+        // 通过文件扩展名判断是否为excel文件
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || !ExcelUtils.isExcelFile(originalFilename)) {
+            throw new RenException("文件不是有效的Excel格式: " + originalFilename);
+        }
+
+        if (file.isEmpty()) {
+            throw new RenException("文件不能为空");
+        }
+
+        return new Result<Map<String, Object>>().ok(wuyuScoreService.readExcel(file));
     }
 
 }

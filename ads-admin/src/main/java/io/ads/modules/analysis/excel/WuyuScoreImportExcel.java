@@ -4,23 +4,20 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.ads.modules.analysis.excel.converter.LevelConverter;
 import lombok.Data;
 
-
 /**
- * 五育分析（五育成绩表）导出用
+ * 五育分析（五育成绩表）导入用，同时也用作导出空模板
  *
  * @author Roxy 1250812574@qq.com
- * @since 1.0.0 2023-11-03
+ * @since 1.0.0 2023-12-02
  */
 @Data
-public class WuyuScoreExcel {
-/*    @ExcelProperty(value = "主键")
-    private Long id;
-    @ExcelProperty(value = "五育权重表id")
-    private int weightId;*/
+public class WuyuScoreImportExcel {
+
     @ExcelProperty(value = "学生学号")
     private String studentNo;
     @ExcelProperty(value = "学生姓名")
     private String studentName;
+    // 分数从Integer类型换成int是因为，Integer读取空值的时候是为null，而int默认值是0，这样直接省下手动设置为0的一步
     @ExcelProperty(value = "品德评定")
     private int characterEthics;
     @ExcelProperty(value = "奖惩记录")
@@ -73,11 +70,5 @@ public class WuyuScoreExcel {
     private int laborPractices;
     @ExcelProperty(value = "劳动课程")
     private int laborCourses;
-    @ExcelProperty(value = "五育综合成绩")
-    private int comprehensiveScore;
-    @ExcelProperty(value = "综合等级", converter = LevelConverter.class)
-    private int comprehensiveLevel;
-    @ExcelProperty(value = "学业等级", converter = LevelConverter.class)
-    private int academicLevel;
 
 }

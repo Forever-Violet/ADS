@@ -1,12 +1,6 @@
 <template>
   <div class="mod-analysis__wuyuscore">
     <el-form :inline="true" :model="state.dataForm" @keyup.enter="state.getDataList()">
-      <el-form-item>
-        <el-button v-if="state.hasPermission('analysis:wuyuscore:save')" type="primary" @click="addOrUpdateHandle()"> 新增 </el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button v-if="state.hasPermission('analysis:wuyuscore:delete')" type="danger" @click="state.deleteHandle()"> 删除 </el-button>
-      </el-form-item>
       <el-form-item v-if="hasSchoolListPermission">
         <el-select v-model="state.dataForm.schoolId" placeholder="选择学校" clearable @change="resetGradeAndSemesterList">
           <!--单选 去掉multiple-->
@@ -38,9 +32,26 @@
         <el-button @click="state.getDataList()">查询</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button v-if="state.hasPermission('sys:user:export')" type="info" @click="state.exportHandle()">导出 </el-button>
+        <el-button v-if="state.hasPermission('analysis:wuyuscore:save')" type="primary" @click="addOrUpdateHandle()"> 新增 </el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button v-if="state.hasPermission('analysis:wuyuscore:delete')" type="danger" @click="state.deleteHandle()"> 删除 </el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button v-if="state.hasPermission('analysis:wuyuscore:export')" type="info" @click="state.exportHandle()">导出 </el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button v-if="state.hasPermission('analysis:wuyuscore:export')" type="info" @click="exportTemplateHandle()">导出Excel模板</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button v-if="state.hasPermission('analysis:wuyuscore:export')" type="primary" @click="importHandle()">Excel导入</el-button>
+      </el-form-item>
+      <el-form-item>
+        <!--只有选择了班级后才能点击-->
+        <el-button v-if="state.hasPermission('analysis:wuyuscore:class')" type="primary" @click="importHandle()">班级报告</el-button>
       </el-form-item>
     </el-form>
+    <input type="file" id="fileInput" style="display: none" @change="fileChanged" />
     <el-table v-loading="state.dataListLoading" :data="state.dataList" border :cell-border="true" @selection-change="state.dataListSelectionChangeHandle" @sort-change="state.dataListSortChangeHandle" style="width: 100%">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
 
@@ -115,6 +126,10 @@ import { reactive, ref, toRefs, onMounted } from "vue";
 import AddOrUpdate from "./wuyuscore-add-or-update.vue";
 import baseService from "@/service/baseService";
 import individualAnalysis from "./wuyuscore-individual-analysis.vue";
+import { getToken } from "@/utils/cache";
+import app from "@/constants/app";
+import axios from "axios";
+import { ElMessage } from "element-plus";
 
 const view = reactive({
   deleteIsBatch: true,
@@ -131,7 +146,7 @@ const view = reactive({
     comprehensiveLevel: ""
   }
 });
-
+const url = ref("");
 const state = reactive({ ...useView(view), ...toRefs(view) });
 const schoolList = ref<any[]>([]);
 const gradeList = ref<any[]>([]);
@@ -212,6 +227,64 @@ const resetClassList = () => {
   getClassList();
 };
 
+// 导出模板
+const exportTemplateHandle = () => {
+  url.value = `${app.api}/analysis/wuyuscore/exportTemplate?token=${getToken()}`;
+  window.location.href = url.value;
+};
+
+// 上传excel
+const importHandle = () => {
+  const fileInput = document.getElementById("fileInput");
+  if (fileInput) {
+    fileInput.click(); //触发上传文件
+  } else {
+    console.error("FileInput not found");
+  }
+};
+
+const fileChanged = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files ? target.files[0] : null;
+  if (!file || (file.type !== "application/vnd.ms-excel" && file.type !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+    // 前端校验 ，后端也校验，主打健壮性
+    ElMessage.error("请上传 Excel 文件 (.xls 或 .xlsx)");
+    return;
+  }
+  const uploadUrl = `${app.api}/analysis/wuyuscore/upload?token=${getToken()}`;
+  const formData = new FormData();
+  formData.append("file", file);
+
+  axios
+    .post(uploadUrl, formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    })
+    .then((response) => {
+      // 检查响应码
+      if (response.data.code === 500) {
+        // 发生异常，显示错误信息
+        ElMessage.error(response.data.msg);
+      } else {
+        // 提取响应结果, 嵌套在data对象里了
+        const successNum = response.data.data.successNum;
+        const failedNum = response.data.data.failedNum;
+        console.log(successNum);
+        console.log(failedNum);
+
+        // 显示成功和失败的记录数
+        ElMessage({
+          message: `成功处理 ${successNum} 条记录，处理失败 ${failedNum} 条记录。`,
+          type: "success"
+        });
+        // 刷新列表
+        state.getDataList();
+      }
+    })
+    .catch((error) => {
+      console.error("文件上传失败", error);
+      ElMessage.error("文件上传失败");
+    });
+};
 const addOrUpdateRef = ref();
 const addOrUpdateHandle = (id?: number) => {
   addOrUpdateRef.value.init(id);
