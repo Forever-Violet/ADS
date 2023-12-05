@@ -78,7 +78,6 @@ import { reactive, ref, toRefs, onMounted } from "vue";
 import AddOrUpdate from "./user-add-or-update.vue";
 import baseService from "@/service/baseService";
 
-
 const view = reactive({
   getDataListURL: "/sys/user/page",
   getDataListIsPage: true,

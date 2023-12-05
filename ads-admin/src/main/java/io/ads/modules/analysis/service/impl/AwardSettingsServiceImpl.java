@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.qiniu.util.StringUtils;
 import io.ads.common.constant.Constant;
+import io.ads.common.exception.RenException;
 import io.ads.common.page.PageData;
 import io.ads.common.service.impl.CrudServiceImpl;
 import io.ads.common.utils.ConvertUtils;
@@ -88,8 +89,10 @@ public class AwardSettingsServiceImpl extends CrudServiceImpl<AwardSettingsDao, 
         if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
             // 如果不是超级管理员，按照用户的学校id填入
             entity.setSchoolId(user.getSchoolId());
-        } else {
-            entity.setSchoolId(0L); //专门给超级管理员留的后门，主要是测试用
+        } else if (dto.getSchoolId() == null){
+            //entity.setSchoolId(0L); //专门给超级管理员留的后门，如果超管忘记选学校，或者通过其他方式提交表单时缺少了学校id
+            // 直接抛异常算了
+            throw new RenException("请选择学校");
         }
 
         insert(entity);

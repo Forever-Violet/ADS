@@ -2,7 +2,7 @@
   <el-dialog v-model="visible" :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :close-on-press-escape="false" width="600px">
     <el-form :model="dataForm" :rules="rules" ref="dataFormRef" @keyup.enter="dataFormSubmitHandle()" label-width="120px">
       <el-form-item v-if="hasSchoolListPermission && !dataForm.id" prop="schoolName" label="所属学校">
-        <el-select v-model="dataForm.schoolId" placeholder="选择学校" clearable @change="getSemesterList">
+        <el-select v-model="dataForm.schoolId" placeholder="选择学校" clearable @change="schoolChangedHandle">
           <el-option v-for="school in schoolList" :key="school.schoolId" :label="school.schoolName" :value="school.schoolId"></el-option>
         </el-select>
       </el-form-item>
@@ -242,15 +242,21 @@ const init = (id?: number) => {
     dataFormRef.value.resetFields();
   }
 
-  getStudentList();
   if (id) {
+    // 如果是更新
     getInfo(id);
+    // 只需获取学期
     getSemesterList();
-  }
-  if (hasSchoolListPermission) {
-    getSchoolList();
   } else {
-    getSemesterList();
+    // 如果是新增 ，判断有无学校列表权限
+    if (hasSchoolListPermission) {
+      // 获取学校列表
+      getSchoolList();
+    } else {
+      // 如果无直接获取学生列表和学期列表
+      getStudentList();
+      getSemesterList();
+    }
   }
 };
 
@@ -264,11 +270,23 @@ const getInfo = (id: number) => {
 const getSchoolList = () => {
   return baseService.get("/sys/school/list").then((res) => {
     schoolList.value = res.data;
+    // 检查返回的列表是否非空
+    if (schoolList.value && schoolList.value.length > 0) {
+      // 设置默认选中第一个学校
+      dataForm.schoolId = schoolList.value[0].schoolId;
+    }
+    // 根据默认选中的学校获取数据
+    getStudentList();
+    getSemesterList();
   });
 };
 // 获取学生列表
 const getStudentList = () => {
-  return baseService.get("/sys/user/student").then((res) => {
+  let schoolId = "";
+  if (dataForm.schoolId != "") {
+    schoolId = dataForm.schoolId;
+  }
+  return baseService.get("/sys/user/student", { schoolId }).then((res) => {
     studentList.value = res.data;
     originalStudentList.value = res.data;
   });
@@ -283,6 +301,16 @@ const getSemesterList = () => {
     semesterList.value = res.data;
   });
 };
+// 学校改变后，重新获取学生列表和学期列表
+const schoolChangedHandle = () => {
+  // 学生选框的搜索框清空
+  searchInput.value = "";
+  // 选择的学生置空
+  dataForm.studentNo = "";
+  getSemesterList();
+  getStudentList();
+};
+
 const handleSearch = () => {
   // 在这里过滤学生列表
   const keyword = searchInput.value.toLowerCase();

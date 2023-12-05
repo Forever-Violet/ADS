@@ -76,9 +76,9 @@ public class SysUserController {
 
     @GetMapping("student")
     @ApiOperation("学生列表")
-    @RequiresPermissions("sys:user:page")
-    public Result<List<SysUserDTO>> get() {
-        List<SysUserDTO> data = sysUserService.getStudentList();
+    @RequiresPermissions("sys:user:student")
+    public Result<List<SysUserDTO>> get(@ApiIgnore @RequestParam Map<String, Object> params) {
+        List<SysUserDTO> data = sysUserService.getStudentList(params);
 
         return new Result<List<SysUserDTO>>().ok(data);
     }

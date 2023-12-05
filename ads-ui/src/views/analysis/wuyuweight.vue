@@ -162,8 +162,6 @@ import AddOrUpdate from "./wuyuweight-add-or-update.vue";
 import baseService from "@/service/baseService";
 
 const view = reactive({
-  deleteIsBatch: true,
-  getDataListIsPage: true,
   exportURL: "/analysis/wuyuweight/export",
   dataForm: {
     schoolId: ""
@@ -212,15 +210,23 @@ onMounted(() => {
   //有权限，才执行
   if (hasSchoolListPermission) {
     getSchoolList();
+  } else {
+    // 没有学校列表权限，即学校人员，直接获取权重
+    getSchoolWeight();
   }
-  // 获取学校权重
-  getSchoolWeight();
 });
 
 // 获取学校列表
 const getSchoolList = () => {
   return baseService.get("/sys/school/list").then((res) => {
     schoolList.value = res.data;
+    // 检查返回的列表是否非空
+    if (schoolList.value && schoolList.value.length > 0) {
+      // 设置默认选中第一个学校
+      state.dataForm.schoolId = schoolList.value[0].schoolId;
+    }
+    // 获取学校权重
+    getSchoolWeight();
   });
 };
 

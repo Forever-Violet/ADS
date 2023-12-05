@@ -1,12 +1,6 @@
 <template>
   <div class="mod-sys__class">
     <el-form :inline="true" :model="state.dataForm" @keyup.enter="state.getDataList()">
-      <el-form-item>
-        <el-button v-if="state.hasPermission('sys:class:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button v-if="state.hasPermission('sys:class:delete')" type="danger" @click="state.deleteHandle()">删除</el-button>
-      </el-form-item>
       <el-form-item v-if="hasSchoolListPermission">
         <el-select v-model="state.dataForm.schoolId" placeholder="选择学校" clearable @change="resetGradeList"> <!--单选 去掉multiple-->
           <el-option v-for="school in schoolList" :key="school.schoolId" :label="school.schoolName" :value="school.schoolId"></el-option>
@@ -20,6 +14,12 @@
 
       <el-form-item>
         <el-button @click="state.getDataList()">查询</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button v-if="state.hasPermission('sys:class:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button v-if="state.hasPermission('sys:class:delete')" type="danger" @click="state.deleteHandle()">删除</el-button>
       </el-form-item>
 
 
@@ -53,6 +53,7 @@ import baseService from "@/service/baseService";
 
 const view = reactive({
   deleteIsBatch: true,
+  createdIsNeed: false,
   getDataListURL: "/sys/class/page",
   getDataListIsPage: true,
   exportURL: "/sys/class/export",
@@ -76,14 +77,25 @@ onMounted(() => {
   //超级管理员才拥有该权限
   if (hasSchoolListPermission) {
     getSchoolList();
+  } else {
+    // 没有学校列表权限的话，直接获取数据
+    state.getDataList();
   }
-  getGradeList();
 });
 
 // 获取学校列表
 const getSchoolList = () => {
   return baseService.get("/sys/school/list").then((res) => {
     schoolList.value = res.data;
+    // 检查返回的列表是否非空
+    if (schoolList.value && schoolList.value.length > 0) {
+      // 设置默认选中第一个学校
+      state.dataForm.schoolId = schoolList.value[0].schoolId;
+    }
+    // 获取数据
+    state.getDataList();
+    // 获取年级列表
+    getGradeList();
   });
 };
 

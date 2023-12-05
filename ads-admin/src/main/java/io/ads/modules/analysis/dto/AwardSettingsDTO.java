@@ -24,6 +24,9 @@ public class AwardSettingsDTO implements Serializable {
 	@ApiModelProperty(value = "主键")
 	private Long id;
 
+	@ApiModelProperty(value = "学校id")
+	private Long schoolId;
+
 	@ApiModelProperty(value = "所属五育 0德育, 1智育, 2体育, 3美育, 4劳育")
 	private Integer topic;
 

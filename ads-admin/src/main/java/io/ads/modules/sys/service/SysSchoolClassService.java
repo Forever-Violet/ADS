@@ -18,4 +18,24 @@ public interface SysSchoolClassService extends CrudService<SysSchoolClassEntity,
      * 根据学号获取班级id
      */
     Long getClassIdByStudentNo(String studentNo);
+
+    /**
+     * 根据班级id获取学校id
+     * @param classId 班级id
+     */
+    Long getSchoolIdByClassId(Long classId);
+
+    /**
+     * 根据班级id获取班级名称
+     * @param classId 班级id
+     * @return 班级名称
+     */
+    String getClassNameByClassId(Long classId);
+
+    /**
+     * 根据班级id获取年级名称
+     * @param classId 班级id
+     * @return 年级名称
+     */
+    String getGradeNameByClassId(Long classId);
 }

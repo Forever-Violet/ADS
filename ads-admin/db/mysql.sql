@@ -173,17 +173,19 @@ CREATE TABLE wuyu_score (
 -- 五育分析 结果（报告）表
 CREATE TABLE wuyu_analysis_result (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
-    class_id BIGINT unique COMMENT '班级ID',
+    semester_id BIGINT COMMENT '学期ID',
+    class_id BIGINT COMMENT '班级ID',
     score_id BIGINT COMMENT '五育成绩ID',
     student_no varchar(50) COMMENT '学生学号',
     student_name varchar(100) COMMENT '学生姓名',
-    response varchar(1000) COMMENT '诊断结果',
+    response varchar(3000) COMMENT '诊断结果',
 
     create_date datetime COMMENT '创建时间',
     INDEX idx_student_name (student_name),
     INDEX idx_student_no (student_no),
     key idx_create_date (create_date),
-    key idx_class_id (class_id)
+    key idx_class_id (class_id),
+    constraint class_id_and_semester_id unique (class_id, semester_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='五育分析 结果（报告）表';
 
 -- 奖项设置

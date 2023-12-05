@@ -1,6 +1,7 @@
 package io.ads.modules.analysis.dao;
 
 import io.ads.common.dao.BaseDao;
+import io.ads.modules.analysis.entity.WuyuAnalysisResultEntity;
 import io.ads.modules.analysis.entity.WuyuScoreEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,4 +18,5 @@ public interface WuyuScoreDao extends BaseDao<WuyuScoreEntity> {
      * 根据五育分数id获取关联的个人诊断报告id
      */
     Long getReportIdByScoreId(Long id);
+
 }

@@ -23,6 +23,10 @@ public class WuyuAnalysisResultEntity {
      */
 	private Long id;
     /**
+     * 学期ID
+     */
+    private Long semesterId;
+    /**
      * 班级ID
      */
 	private Long classId;

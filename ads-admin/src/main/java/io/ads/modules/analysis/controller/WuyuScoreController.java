@@ -11,6 +11,7 @@ import io.ads.common.utils.Result;
 import io.ads.common.utils.ValidDtoUtils;
 import io.ads.common.validator.AssertUtils;
 import io.ads.modules.analysis.dto.WuyuAnalysisResultDTO;
+import io.ads.modules.analysis.dto.WuyuClassAnalysisResultDTO;
 import io.ads.modules.analysis.dto.WuyuScoreDTO;
 import io.ads.modules.analysis.excel.WuyuScoreExcel;
 import io.ads.modules.analysis.excel.WuyuScoreImportExcel;
@@ -135,6 +136,27 @@ public class WuyuScoreController {
     @RequiresPermissions("analysis:wuyuscore:individual")
     public Result reIndividualAnalysis(@PathVariable("id") Long id) {
         wuyuScoreService.reGenAnalysisReport(id);
+
+        return new Result();
+    }
+
+    @GetMapping("class")
+    @ApiOperation("班级诊断报告")
+    @LogOperation("班级诊断")
+    @RequiresPermissions("analysis:wuyuscore:class")
+    public Result classAnalysis(@RequestParam("classId") Long classId,  @RequestParam(value = "semesterId", required = false) Long semesterId) {
+        WuyuClassAnalysisResultDTO dto = wuyuScoreService.genOrGetClassAnalysisReport(classId, semesterId);
+
+        return new Result<WuyuClassAnalysisResultDTO>().ok(dto);
+    }
+
+    @PutMapping("class/re")
+    @ApiOperation("重新生成班级诊断报告")
+    @LogOperation("re班级诊断")
+    @RequiresPermissions("analysis:wuyuscore:class")
+    public Result reClassAnalysis(@RequestParam("classId") Long classId,  @RequestParam(value = "semesterId", required = false) Long semesterId) {
+
+        wuyuScoreService.reGenClassAnalysisReport(classId, semesterId);
 
         return new Result();
     }

@@ -30,6 +30,9 @@
           inner join sys_user t3 on t2.user_id = t3.id
         where t3.username = #{value}
     </select>
+    <select id="getSchoolIdByClassId" resultType="java.lang.Long">
+        select school_id from sys_school_class where id = #{value}
+    </select>
 
 
 </mapper>

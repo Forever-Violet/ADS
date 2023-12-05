@@ -19,7 +19,6 @@ import io.ads.modules.security.user.SecurityUser;
 import io.ads.modules.security.user.UserDetail;
 import io.ads.modules.sys.dao.SysUserDao;
 import io.ads.modules.sys.dto.SysUserDTO;
-import io.ads.modules.sys.entity.SysUserClassEntity;
 import io.ads.modules.sys.entity.SysUserEntity;
 import io.ads.modules.sys.enums.SuperAdminEnum;
 import io.ads.modules.sys.service.SysSchoolService;
@@ -29,11 +28,9 @@ import io.ads.modules.sys.service.SysUserClassService;
 import io.ads.modules.sys.service.SysUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.*;
 
 
@@ -202,8 +199,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     }
 
     @Override
-    public List<SysUserDTO> getStudentList() {
-        Map<String, Object> params = new HashMap<>();
+    public List<SysUserDTO> getStudentList(Map<String, Object> params) {
         UserDetail user = SecurityUser.getUser();
         if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
             // 如果用户非超级管理员，只能查询其学校的学生列表

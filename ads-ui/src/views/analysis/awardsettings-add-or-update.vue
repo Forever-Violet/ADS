@@ -1,6 +1,11 @@
 <template>
   <el-dialog v-model="visible" :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :close-on-press-escape="false">
     <el-form :model="dataForm" :rules="rules" ref="dataFormRef" @keyup.enter="dataFormSubmitHandle()" label-width="120px">
+      <el-form-item v-if="hasSchoolListPermission && !dataForm.id" prop="schoolName" label="所属学校">
+        <el-select v-model="dataForm.schoolId" placeholder="选择学校" clearable>
+          <el-option v-for="school in schoolList" :key="school.schoolId" :label="school.schoolName" :value="school.schoolId"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="所属五育" prop="topic">
         <ren-select v-model="dataForm.topic" dict-type="topic" placeholder="所属五育" @change="resetSubtopicOption"></ren-select>
       </el-form-item>
@@ -45,17 +50,18 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import {reactive, ref, toRefs} from "vue";
 import baseService from "@/service/baseService";
 import { ElMessage } from "element-plus";
+import useView from "@/hooks/useView";
 
 const emit = defineEmits(["refreshDataList"]);
 
 const visible = ref(false);
 const dataFormRef = ref();
-
 const dataForm = reactive({
   id: "",
+  schoolId: "",
   topic: "",
   subtopic: "",
   level: "",
@@ -63,10 +69,12 @@ const dataForm = reactive({
   grade: "无", //新增时，等级单选框默认为无
   remarks: ""
 });
-
 // 自定义的等级列表
 const customLevels = ref([{ name: "" }, { name: "" }, { name: "" }]);
 
+const schoolList = ref<any[]>([]);
+const state = reactive({ ...useView(dataForm), ...toRefs(dataForm) });
+const hasSchoolListPermission = state.hasPermission("sys:school:list");
 const rules = ref({
   topic: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
   subtopic: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
@@ -87,9 +95,22 @@ const init = (id?: number) => {
 
   if (id) {
     getInfo(id);
+  } else if (hasSchoolListPermission) {
+    // 获取学校列表
+    getSchoolList();
   }
 };
-
+// 获取学校列表
+const getSchoolList = () => {
+  return baseService.get("/sys/school/list").then((res) => {
+    schoolList.value = res.data;
+    // 检查返回的列表是否非空
+    if (schoolList.value && schoolList.value.length > 0) {
+      // 设置默认选中第一个学校
+      dataForm.schoolId = schoolList.value[0].schoolId;
+    }
+  });
+};
 // 获取信息
 const getInfo = (id: number) => {
   baseService.get("/analysis/awardsettings/" + id).then((res) => {

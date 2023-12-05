@@ -48,7 +48,7 @@
       </el-form-item>
       <el-form-item>
         <!--只有选择了班级后才能点击-->
-        <el-button v-if="state.hasPermission('analysis:wuyuscore:class')" type="primary" @click="importHandle()">班级报告</el-button>
+        <el-button v-if="state.hasPermission('analysis:wuyuscore:class')" type="success" @click="classAnalysisHandle(state.dataForm.classId, state.dataForm.semesterId)" :disabled="!state.dataForm.classId">班级诊断报告</el-button>
       </el-form-item>
     </el-form>
     <input type="file" id="fileInput" style="display: none" @change="fileChanged" />
@@ -117,15 +117,18 @@
     <add-or-update ref="addOrUpdateRef" @refreshDataList="state.getDataList">确定</add-or-update>
 
     <individualAnalysis ref="individualAnalysisRef"></individualAnalysis>
+    <classAnalysis ref="classAnalysisRef"></classAnalysis>
+
   </div>
 </template>
 
 <script lang="ts" setup>
 import useView from "@/hooks/useView";
-import { reactive, ref, toRefs, onMounted } from "vue";
+import { reactive, ref, toRefs, onMounted, watch } from "vue";
 import AddOrUpdate from "./wuyuscore-add-or-update.vue";
 import baseService from "@/service/baseService";
 import individualAnalysis from "./wuyuscore-individual-analysis.vue";
+import classAnalysis from "./wuyuscore-class-analysis.vue";
 import { getToken } from "@/utils/cache";
 import app from "@/constants/app";
 import axios from "axios";
@@ -134,6 +137,8 @@ import { ElMessage } from "element-plus";
 const view = reactive({
   deleteIsBatch: true,
   getDataListURL: "/analysis/wuyuscore/page",
+  // 这个属性是设置此页面是否在创建时，调用查询数据列表接口。这个页面里创建时不需要调用，而是在自动选择的学期后调用
+  createdIsNeed: false,
   getDataListIsPage: true,
   exportURL: "/analysis/wuyuscore/export",
   deleteURL: "/analysis/wuyuscore",
@@ -171,9 +176,11 @@ const getSchoolList = () => {
   return baseService.get("/sys/school/list").then((res) => {
     schoolList.value = res.data;
     // 默认选择第一个学校
-    state.dataForm.schoolId = schoolList.value[0].schoolId;
+    if (schoolList.value && schoolList.value.length > 0) {
+      state.dataForm.schoolId = schoolList.value[0].schoolId;
+    }
     // 重新获取数据
-    state.getDataList();
+    //state.getDataList();
     // 选择后直接获取列表
     getGradeList();
     getSemesterList();
@@ -187,6 +194,12 @@ const getSemesterList = () => {
   }
   return baseService.get("/sys/semester/list", { schoolId }).then((res) => {
     semesterList.value = res.data;
+    // 检查返回的列表是否非空
+    if (semesterList.value && semesterList.value.length > 0) {
+      // 设置默认选中第一个学期
+      state.dataForm.semesterId = semesterList.value[0].id;
+    }
+    state.getDataList();
   });
 };
 // 获取年级列表
@@ -285,6 +298,17 @@ const fileChanged = (event: Event) => {
       ElMessage.error("文件上传失败");
     });
 };
+
+// 监听 state.dataForm 中的某些属性
+/*watch(
+  () => [state.dataForm.schoolId, state.dataForm.gradeId, state.dataForm.classId, state.dataForm.semesterId],
+  () => {
+    // 当这些属性之一发生变化时，重新获取数据，    这个功能先放着，暂时还是让用户自己点击查询去更新数据
+    state.getDataList();
+  },
+  { deep: true }
+);*/
+
 const addOrUpdateRef = ref();
 const addOrUpdateHandle = (id?: number) => {
   addOrUpdateRef.value.init(id);
@@ -293,5 +317,11 @@ const addOrUpdateHandle = (id?: number) => {
 const individualAnalysisRef = ref();
 const individualAnalysisHandle = (id?: number) => {
   individualAnalysisRef.value.init(id);
+};
+
+const classAnalysisRef = ref();
+const classAnalysisHandle = (classId: string, semesterId: string) => {
+  console.log(classId + " " + semesterId);
+  classAnalysisRef.value.init(classId, semesterId);
 };
 </script>

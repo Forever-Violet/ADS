@@ -10,6 +10,7 @@ import io.ads.modules.security.password.PasswordUtils;
 import io.ads.modules.security.user.SecurityUser;
 import io.ads.modules.security.user.UserDetail;
 import io.ads.modules.sys.dao.SysSchoolClassDao;
+import io.ads.modules.sys.dao.SysUserClassDao;
 import io.ads.modules.sys.dto.SysSchoolClassDTO;
 import io.ads.modules.sys.dto.SysSchoolClassDTO;
 import io.ads.modules.sys.entity.SysSchoolClassEntity;
@@ -17,7 +18,9 @@ import io.ads.modules.sys.entity.SysSchoolClassEntity;
 import io.ads.modules.sys.enums.SuperAdminEnum;
 import io.ads.modules.sys.service.SysSchoolClassService;
 import cn.hutool.core.util.StrUtil;
+import io.ads.modules.sys.service.SysUserClassService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,9 @@ import java.util.Map;
  */
 @Service
 public class SysSchoolClassServiceImpl extends CrudServiceImpl<SysSchoolClassDao, SysSchoolClassEntity, SysSchoolClassDTO> implements SysSchoolClassService {
+
+    @Autowired
+    SysUserClassDao sysUserClassDao;
 
     @Override
     public QueryWrapper<SysSchoolClassEntity> getWrapper(Map<String, Object> params){
@@ -111,5 +117,20 @@ public class SysSchoolClassServiceImpl extends CrudServiceImpl<SysSchoolClassDao
     @Override
     public Long getClassIdByStudentNo(String studentNo) {
         return baseDao.getClassIdByStudentNo(studentNo);
+    }
+
+    @Override
+    public Long getSchoolIdByClassId(Long classId) {
+        return baseDao.getSchoolIdByClassId(classId);
+    }
+
+    @Override
+    public String getClassNameByClassId(Long classId) {
+        return sysUserClassDao.getClassNameById(classId);
+    }
+
+    @Override
+    public String getGradeNameByClassId(Long classId) {
+        return sysUserClassDao.getGradeNameById(classId);
     }
 }

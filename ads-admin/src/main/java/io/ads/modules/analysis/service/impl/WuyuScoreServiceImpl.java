@@ -1,10 +1,7 @@
 package io.ads.modules.analysis.service.impl;
 
-import cn.hutool.core.date.DateTime;
-import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.mchange.lang.IntegerUtils;
 import io.ads.common.exception.RenException;
 import io.ads.common.service.impl.CrudServiceImpl;
 import io.ads.common.utils.ConvertUtils;
@@ -12,15 +9,13 @@ import io.ads.common.utils.ExcelUtils;
 import io.ads.modules.analysis.dao.WuyuAnalysisResultDao;
 import io.ads.modules.analysis.dao.WuyuScoreDao;
 import io.ads.modules.analysis.dto.WuyuAnalysisResultDTO;
+import io.ads.modules.analysis.dto.WuyuClassAnalysisResultDTO;
 import io.ads.modules.analysis.dto.WuyuScoreDTO;
 import io.ads.modules.analysis.dto.WuyuWeightDTO;
 import io.ads.modules.analysis.entity.WuyuAnalysisResultEntity;
 import io.ads.modules.analysis.entity.WuyuScoreEntity;
-import io.ads.modules.analysis.entity.WuyuWeightEntity;
-import io.ads.modules.analysis.excel.WuyuScoreExcel;
 import io.ads.modules.analysis.excel.WuyuScoreImportExcel;
 import io.ads.modules.analysis.excel.listener.WuyuScoreReadListener;
-import io.ads.modules.analysis.service.WuyuAnalysisResultService;
 import io.ads.modules.analysis.service.WuyuScoreService;
 import cn.hutool.core.util.StrUtil;
 import io.ads.modules.analysis.service.WuyuWeightService;
@@ -32,10 +27,10 @@ import io.ads.modules.sys.service.SysSchoolClassService;
 import io.ads.modules.sys.service.SysSchoolGradeService;
 import io.ads.modules.sys.service.SysSchoolSemesterService;
 import io.ads.modules.sys.service.SysUserService;
-import io.swagger.models.auth.In;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -46,10 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -82,6 +74,9 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
     RestTemplate restTemplate;
     // 分析接口
     private final String ANALYSIS_URL = "https://chatglm2.tocmcc.cn:443";
+
+    @Value("${analysis.promptTail}") //班级诊断prompt的尾部
+    private String classPromptTail;
 
 
     @Override
@@ -220,52 +215,67 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
 
     // 计算五育综合成绩
     private Integer calComprehensiveScore(WuyuScoreDTO scoreDto, WuyuWeightDTO weightDto) {
-
         // 德育
-        Integer moral = (int) (scoreDto.getCharacterEthics() * weightDto.getCharacterEthics()
-                        + scoreDto.getRewardsPunishments() * weightDto.getRewardsPunishments()
-                        + scoreDto.getMoralEducationCourses() * weightDto.getMoralEducationCourses()
-                        + scoreDto.getPracticalActivities() * weightDto.getPracticalActivities()
-                        + scoreDto.getOnlineCulture() * weightDto.getOnlineCulture()
-                        + scoreDto.getInterpersonalRelationships() * weightDto.getInterpersonalRelationships());
+        Integer moral = calMoralScore(scoreDto, weightDto);
         // 智育
-        Integer intellectual = (int) (scoreDto.getPrepManagement() * weightDto.getPrepManagement()
-                        + scoreDto.getPlanManagement() * weightDto.getPlanManagement()
-                        + scoreDto.getClassroomBehavior() * weightDto.getClassroomBehavior()
-                        + scoreDto.getClassroomAttendance() * weightDto.getClassroomAttendance()
-                        + scoreDto.getHomeworkManagement() * weightDto.getHomeworkManagement()
-                        + scoreDto.getReviewManagement() * weightDto.getReviewManagement()
-                        + scoreDto.getPersonalAbilities() * weightDto.getPersonalAbilities()
-                        + scoreDto.getAcademicPerformance() * weightDto.getAcademicPerformance()
-                        + scoreDto.getExperimentalCompetitions() * weightDto.getExperimentalCompetitions());
-
+        Integer intellectual = calIntellectualScore(scoreDto, weightDto);
         // 体育
-        Integer physical = (int) (scoreDto.getExaminationMetrics() * weightDto.getExaminationMetrics()
-                        + scoreDto.getPhysicalFitnessScores() * weightDto.getPhysicalFitnessScores()
-                        + scoreDto.getSportingSpecialties() * weightDto.getSportingSpecialties()
-                        + scoreDto.getHealthyLiving() * weightDto.getHealthyLiving()
-                        + scoreDto.getMentalQualities() * weightDto.getMentalQualities()
-                        + scoreDto.getPhysicalEducationCourses() * weightDto.getPhysicalEducationCourses());
-
+        Integer physical = calPhysicalScore(scoreDto, weightDto);
         // 美育
-        Integer artistic = (int) (scoreDto.getArtsCourses() * weightDto.getArtsCourses()
-                        + scoreDto.getArtsAchievements() * weightDto.getArtsAchievements()
-                        + scoreDto.getArtsActivities() * weightDto.getArtsActivities());
-
+        Integer artistic = calArtisticScore(scoreDto, weightDto);
         // 劳育
-        Integer labor = (int) (scoreDto.getLaborPractices() * weightDto.getLaborPractices()
-                        + scoreDto.getLaborCourses() * weightDto.getLaborCourses());
+        Integer labor = calLaborScore(scoreDto, weightDto);
 
         return (int) (moral * weightDto.getMoral() + intellectual * weightDto.getIntellectual()
                         + physical * weightDto.getPhysical() + artistic * weightDto.getArtistic()
                         + labor * weightDto.getLabor());
-
+    }
+    // 计算德育分数
+    private Integer calMoralScore(WuyuScoreDTO scoreDto, WuyuWeightDTO weightDto) {
+        return (int) (scoreDto.getCharacterEthics() * weightDto.getCharacterEthics()
+                + scoreDto.getRewardsPunishments() * weightDto.getRewardsPunishments()
+                + scoreDto.getMoralEducationCourses() * weightDto.getMoralEducationCourses()
+                + scoreDto.getPracticalActivities() * weightDto.getPracticalActivities()
+                + scoreDto.getOnlineCulture() * weightDto.getOnlineCulture()
+                + scoreDto.getInterpersonalRelationships() * weightDto.getInterpersonalRelationships());
+    }
+    // 计算智育分数
+    private Integer calIntellectualScore(WuyuScoreDTO scoreDto, WuyuWeightDTO weightDto) {
+        return (int) (scoreDto.getPrepManagement() * weightDto.getPrepManagement()
+                + scoreDto.getPlanManagement() * weightDto.getPlanManagement()
+                + scoreDto.getClassroomBehavior() * weightDto.getClassroomBehavior()
+                + scoreDto.getClassroomAttendance() * weightDto.getClassroomAttendance()
+                + scoreDto.getHomeworkManagement() * weightDto.getHomeworkManagement()
+                + scoreDto.getReviewManagement() * weightDto.getReviewManagement()
+                + scoreDto.getPersonalAbilities() * weightDto.getPersonalAbilities()
+                + scoreDto.getAcademicPerformance() * weightDto.getAcademicPerformance()
+                + scoreDto.getExperimentalCompetitions() * weightDto.getExperimentalCompetitions());
+    }
+    // 计算体育分数
+    private Integer calPhysicalScore(WuyuScoreDTO scoreDto, WuyuWeightDTO weightDto) {
+        return (int) (scoreDto.getExaminationMetrics() * weightDto.getExaminationMetrics()
+                + scoreDto.getPhysicalFitnessScores() * weightDto.getPhysicalFitnessScores()
+                + scoreDto.getSportingSpecialties() * weightDto.getSportingSpecialties()
+                + scoreDto.getHealthyLiving() * weightDto.getHealthyLiving()
+                + scoreDto.getMentalQualities() * weightDto.getMentalQualities()
+                + scoreDto.getPhysicalEducationCourses() * weightDto.getPhysicalEducationCourses());
+    }
+    // 计算美育分数
+    private Integer calArtisticScore(WuyuScoreDTO scoreDto, WuyuWeightDTO weightDto) {
+        return (int) (scoreDto.getArtsCourses() * weightDto.getArtsCourses()
+                + scoreDto.getArtsAchievements() * weightDto.getArtsAchievements()
+                + scoreDto.getArtsActivities() * weightDto.getArtsActivities());
+    }
+    // 计算劳育分数
+    private Integer calLaborScore(WuyuScoreDTO scoreDto, WuyuWeightDTO weightDto) {
+        return (int) (scoreDto.getLaborPractices() * weightDto.getLaborPractices()
+                + scoreDto.getLaborCourses() * weightDto.getLaborCourses());
     }
 
     @Override
     public WuyuAnalysisResultDTO genOrGetAnalysisReport(Long id) {
 
-        WuyuAnalysisResultDTO reportDto = new WuyuAnalysisResultDTO();
+        WuyuAnalysisResultDTO reportDTO = new WuyuAnalysisResultDTO();
 
         // 根据五育分数id查询 五育诊断报告
         WuyuAnalysisResultEntity reportEntity = getReportByScoreId(id);
@@ -274,35 +284,31 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
             // 先根据五育分数id 获取五育分数
             WuyuScoreDTO wuyuScoreDTO = get(id);
             // 生成报告
-            reportDto = genAnalysisReport(wuyuScoreDTO);
-
+            reportDTO = genAnalysisReport(wuyuScoreDTO);
+            // 返回的dto也填充剩余字段
+            reportDTO.setScoreId(id);
+            reportDTO.setStudentNo(wuyuScoreDTO.getStudentNo());
+            reportDTO.setStudentName(wuyuScoreDTO.getStudentName());
             // 报告保存到数据库
             reportEntity = new WuyuAnalysisResultEntity();
-            BeanUtils.copyProperties(reportDto, reportEntity);
-            // 填充其他字段
-            reportEntity.setScoreId(id);
-            reportEntity.setStudentNo(wuyuScoreDTO.getStudentNo());
-            reportEntity.setStudentName(wuyuScoreDTO.getStudentName());
+            BeanUtils.copyProperties(reportDTO, reportEntity);
 
             wuyuAnalysisResultDao.insert(reportEntity);
-
-            // 返回的dto也填充剩余字段
-            reportDto.setScoreId(id);
-            reportDto.setStudentNo(wuyuScoreDTO.getStudentNo());
-            reportDto.setStudentName(wuyuScoreDTO.getStudentName());
+            // 插入后 回填id
+            reportDTO.setId(reportEntity.getId());
         } else if (reportEntity.getResponse() == null) {  // 或 报告的内容为空，那么重新生成（修改而不是插入）
             // 代理对象
             WuyuScoreServiceImpl currentProxy = (WuyuScoreServiceImpl)AopContext.currentProxy();
             currentProxy.reGenAnalysisReport(id);
             // 再次查询，填充报告内容
             reportEntity = getReportByScoreId(id);
-            BeanUtils.copyProperties(reportEntity, reportDto);
+            BeanUtils.copyProperties(reportEntity, reportDTO);
         } else {
             // 如果存在直接返回
-            BeanUtils.copyProperties(reportEntity, reportDto);
+            BeanUtils.copyProperties(reportEntity, reportDTO);
         }
         // 返回
-        return reportDto;
+        return reportDTO;
 
     }
 
@@ -333,7 +339,7 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         }
     }
 
-    // 根据五育分数 生成诊断报告
+    // 根据五育分数 生成个人诊断报告
     private WuyuAnalysisResultDTO genAnalysisReport(WuyuScoreDTO dto) {
 
         Map<String, String> requestBody = new HashMap<>();
@@ -351,15 +357,14 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(requestBody, headers);
 
         try {
-            WuyuAnalysisResultDTO reportDto = restTemplate.postForObject(ANALYSIS_URL, httpEntity, WuyuAnalysisResultDTO.class);
-            assert reportDto != null;
-            System.out.println("============" + reportDto.getResponse());
-            return reportDto;
+            WuyuAnalysisResultDTO reportDTO = restTemplate.postForObject(ANALYSIS_URL, httpEntity, WuyuAnalysisResultDTO.class);
+            assert reportDTO != null;
+            System.out.println("============" + reportDTO.getResponse());
+            return reportDTO;
         } catch (Exception e) {
             e.printStackTrace();
             throw new RenException("生成报告失败，请联系管理员。");
         }
-
     }
 
     // 根据五育分数生成 prompt
@@ -479,7 +484,200 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         resultMap.put("failedNum", failed);
         resultMap.put("successNum", success);
 
-
         return resultMap;
     }
+
+
+    @Override
+    public WuyuClassAnalysisResultDTO genOrGetClassAnalysisReport(Long classId, Long semesterId) {
+        WuyuClassAnalysisResultDTO reportDTO = null;
+        Long schoolId = sysSchoolClassService.getSchoolIdByClassId(classId);
+        if (semesterId == null) { //如果没有选择学期，那么默认以最新的学期
+            semesterId = sysSchoolSemesterService.getLatestSemesterId(schoolId);
+            if (semesterId == null) {
+                throw new RenException("请联系管理员设置学期");
+            }
+        }
+        // 首先用classId和semesterId 查询 班级诊断报告
+        WuyuAnalysisResultEntity reportEntity = getReportByClassIdAndSemesterId(classId, semesterId);
+        if (reportEntity == null) {
+
+            reportDTO = buildClassAnalysisReportDTO(classId, semesterId, schoolId);
+            // 如果不存在报告，那么生成
+            genClassAnalysisReport(reportDTO);
+            // 填充DTO剩余字段
+            reportDTO.setClassName(sysSchoolClassService.getClassNameByClassId(classId));
+            reportDTO.setGradeName(sysSchoolClassService.getGradeNameByClassId(classId));
+            reportDTO.setClassId(classId);
+            reportDTO.setSemesterId(semesterId);
+            // 报告保存到数据库
+            reportEntity = new WuyuAnalysisResultEntity();
+            BeanUtils.copyProperties(reportDTO, reportEntity);
+            wuyuAnalysisResultDao.insert(reportEntity);
+            // 插入后 回填id
+            reportDTO.setId(reportEntity.getId());
+        } else if (reportEntity.getResponse() == null) {  // 或 报告的内容为空，那么重新生成response（修改而不是插入）
+
+            reportDTO = buildClassAnalysisReportDTO(classId, semesterId, schoolId);
+            // 更新 报告内容
+            reportEntity.setResponse(genClassAnalysisReport(reportDTO).getResponse());
+            // 更新 自动根据报告id更新
+            wuyuAnalysisResultDao.update(reportEntity, new LambdaQueryWrapper<WuyuAnalysisResultEntity>()
+                    .eq(WuyuAnalysisResultEntity::getId, reportEntity.getId())
+            );
+            // 再次查询，填充报告内容
+            reportEntity = getReportByClassIdAndSemesterId(classId, semesterId);
+            BeanUtils.copyProperties(reportEntity, reportDTO);
+            // 填充 班级名称和年级名称
+            reportDTO.setClassName(sysSchoolClassService.getClassNameByClassId(classId));
+            reportDTO.setGradeName(sysSchoolClassService.getGradeNameByClassId(classId));
+        } else {
+            //如果存在填充额外字段后返回
+            reportDTO = buildClassAnalysisReportDTO(classId, semesterId, schoolId);
+            // 填充 班级名称和年级名称
+            reportDTO.setClassName(sysSchoolClassService.getClassNameByClassId(classId));
+            reportDTO.setGradeName(sysSchoolClassService.getGradeNameByClassId(classId));
+            BeanUtils.copyProperties(reportEntity, reportDTO);
+        }
+
+        return reportDTO;
+    }
+    // 根据 班级id和学期id重新生成个人诊断报告
+    @Override
+    public void reGenClassAnalysisReport(Long classId, Long semesterId) {
+        Long schoolId = sysSchoolClassService.getSchoolIdByClassId(classId);
+        if (semesterId == null) { //如果没有选择学期，那么默认以最新的学期
+            semesterId = sysSchoolSemesterService.getLatestSemesterId(schoolId);
+            if (semesterId == null) {
+                throw new RenException("请联系管理员设置学期");
+            }
+        }
+        // 根据 classId和semesterId 查询 班级诊断报告
+        WuyuAnalysisResultEntity reportEntity = getReportByClassIdAndSemesterId(classId, semesterId);
+        if (reportEntity == null) {
+            genOrGetClassAnalysisReport(classId, semesterId);
+        } else {
+            // 如果存在，重新生成报告内容
+            reportEntity.setResponse(genClassAnalysisReport(
+                    buildClassAnalysisReportDTO(classId, semesterId, schoolId)).getResponse());
+            // 更新到数据库
+            wuyuAnalysisResultDao.update(reportEntity, new LambdaQueryWrapper<WuyuAnalysisResultEntity>()
+                    .eq(WuyuAnalysisResultEntity::getId, reportEntity.getId())
+            );
+        }
+
+    }
+    // 生成班级诊断报告
+    private WuyuClassAnalysisResultDTO genClassAnalysisReport(WuyuClassAnalysisResultDTO reportDTO) {
+        Map<String, String> requestBody = new HashMap<>();
+
+        String prompt = createClassPrompt(reportDTO) + classPromptTail;
+        requestBody.put("prompt", prompt);
+        System.out.println("========================================" + prompt);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(requestBody, headers);
+        try {
+            reportDTO.setResponse(Objects.requireNonNull(restTemplate.postForObject(ANALYSIS_URL, httpEntity, WuyuClassAnalysisResultDTO.class)).getResponse());
+            System.out.println("============" + reportDTO.getResponse());
+            return reportDTO;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RenException("生成报告失败，请联系管理员。");
+        }
+    }
+
+    // 生成班级 prompt
+    private String createClassPrompt(WuyuClassAnalysisResultDTO reportDTO) {
+        return String.format("本学期该班共%d人。%d位学生的五育综合等级为差，%d位学生的五育综合等级为中，%d位学生的五育综合等级为优。" +
+                        "该班的德育平均分为%d分，智育平均分为%d分，体育平均分为%d，劳育平均分为%d，美育平均分为%d。"
+                , reportDTO.getStudentNum(), reportDTO.getLowLevelNum(), reportDTO.getMiddleLevelNum(), reportDTO.getHighLevelNum(),
+                reportDTO.getMoralScore(), reportDTO.getIntellectualScore(),
+                reportDTO.getPhysicalScore(), reportDTO.getArtisticScore(), reportDTO.getLaborScore());
+    }
+    // 计算该班级的总人数（根据分数的记录来计算），五育平均分数以及五育等级的人数分布情况
+    private WuyuClassAnalysisResultDTO buildClassAnalysisReportDTO(Long classId, Long semesterId, Long schoolId) {
+        WuyuClassAnalysisResultDTO classReportDTO = new WuyuClassAnalysisResultDTO();
+        // 通过班级id和学期id查询 五育分数记录列表
+        List<WuyuScoreEntity> classScoreList = baseDao.selectList(new LambdaQueryWrapper<WuyuScoreEntity>()
+                .eq(WuyuScoreEntity::getClassId, classId)
+                .eq(WuyuScoreEntity::getSemesterId, semesterId)
+        );
+        if (classScoreList.size() == 0) { //如果没有记录直接结束
+            throw new RenException("当前学期该班级没有导入五育成绩记录！");
+        }
+        // 填充该班级的总人数
+        classReportDTO.setStudentNum(classScoreList.size());
+        // 计算班级的五育平均分
+        // 在 Java 中，基本数据类型和对象都是按值传递的。
+        // 当基本数据类型被传递给方法时，它们是按值传递的。这意味着方法接收的是这些值的副本，原始值不会被改变。
+        // 当你在方法中传递一个对象（就比如 classReportDTO），
+        // 你实际上传递的是该对象的引用（传递的是引用的值，这意味着传递的是指向堆内存中对象的地址的副本），而不是对象本身的拷贝。
+        // 因此，在 calClassWuyuAverageScore 方法中修改了 classReportDTO 对象的属性时，实际上修改的是同一个对象，
+        // 不需要将它的引用再次赋值给 classReportDTO，因为它已经指向了同一个对象。
+        // 简单来说，基本类型的值是实际的数据，而对象类型的值是指向对象的引用。
+        calClassWuyuAverageScore(classScoreList, classReportDTO, schoolId);
+        // 计算班级的五育等级的人数分布情况
+        calClassComprehensiveLevel(classScoreList, classReportDTO);
+
+        return classReportDTO;
+    }
+
+    // 计算班级的五育平均分
+    private void calClassWuyuAverageScore(List<WuyuScoreEntity> classScoreList
+            , WuyuClassAnalysisResultDTO classReportDTO, Long schoolId) {
+        int total = classScoreList.size();
+        int moral = 0;
+        int intellectual = 0;
+        int physical = 0;
+        int artistic = 0;
+        int labor = 0;
+        WuyuWeightDTO wuyuWeightDTO = wuyuWeightService.getBySchoolId(new HashMap<String, Object>(){{
+            put("schoolId", schoolId);
+        }});
+        for (WuyuScoreEntity entity : classScoreList) {
+            moral += calMoralScore(ConvertUtils.sourceToTarget(entity, WuyuScoreDTO.class), wuyuWeightDTO);
+            intellectual += calIntellectualScore(ConvertUtils.sourceToTarget(entity, WuyuScoreDTO.class), wuyuWeightDTO);
+            physical += calPhysicalScore(ConvertUtils.sourceToTarget(entity, WuyuScoreDTO.class), wuyuWeightDTO);
+            artistic += calArtisticScore(ConvertUtils.sourceToTarget(entity, WuyuScoreDTO.class), wuyuWeightDTO);
+            labor += calLaborScore(ConvertUtils.sourceToTarget(entity, WuyuScoreDTO.class), wuyuWeightDTO);
+        }
+        if(total != 0) {
+            classReportDTO.setMoralScore(moral / total);
+            classReportDTO.setIntellectualScore(intellectual / total);
+            classReportDTO.setPhysicalScore(physical / total);
+            classReportDTO.setArtisticScore(artistic / total);
+            classReportDTO.setLaborScore(labor / total);
+        }
+    }
+    // 计算班级的五育等级的人数分布情况
+    private void calClassComprehensiveLevel(List<WuyuScoreEntity> classScoreList
+            , WuyuClassAnalysisResultDTO classReportDTO) {
+        int lowLevelNum = 0;
+        int middleLevelNum = 0;
+        int highLevelNum = 0;
+        for(WuyuScoreEntity entity : classScoreList) {
+
+            if (entity.getComprehensiveLevel() == 0) {
+                highLevelNum++;
+            } else if (entity.getComprehensiveLevel() == 1){
+                middleLevelNum++;
+            } else {
+                lowLevelNum++;
+            }
+        }
+        classReportDTO.setLowLevelNum(lowLevelNum);
+        classReportDTO.setMiddleLevelNum(middleLevelNum);
+        classReportDTO.setHighLevelNum(highLevelNum);
+    }
+
+
+    // 根据班级id和学期id查询班级诊断报告
+    private WuyuAnalysisResultEntity getReportByClassIdAndSemesterId(Long classId, Long semesterId) {
+        LambdaQueryWrapper<WuyuAnalysisResultEntity> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(WuyuAnalysisResultEntity::getClassId, classId)
+                .eq(WuyuAnalysisResultEntity::getSemesterId, semesterId);
+        return wuyuAnalysisResultDao.selectOne(lqw);
+    }
+
 }

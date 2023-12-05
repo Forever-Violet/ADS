@@ -26,6 +26,9 @@ public class WuyuAnalysisResultDTO implements Serializable {
 	@ApiModelProperty(value = "班级ID")
 	private Long classId;
 
+	@ApiModelProperty(value = "学期ID")
+	private Long semesterId;
+
 	@ApiModelProperty(value = "五育成绩ID")
 	private Long scoreId;
 
@@ -36,7 +39,7 @@ public class WuyuAnalysisResultDTO implements Serializable {
 	private String studentName;
 
 	@ApiModelProperty(value = "诊断结果")
-	@Length(max = 1000, min = 0, message = "超过字数限制（1000字）！")
+	@Length(max = 3000, min = 0, message = "超过字数限制（3000字）！")
 	private String response;
 
 	@ApiModelProperty(value = "创建时间")

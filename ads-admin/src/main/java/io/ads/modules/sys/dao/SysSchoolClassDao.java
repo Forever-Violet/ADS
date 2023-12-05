@@ -22,4 +22,11 @@ public interface SysSchoolClassDao extends BaseDao<SysSchoolClassEntity> {
      * 根据学号获取班级id
      */
     Long getClassIdByStudentNo(String studentNo);
+
+    /**
+     * 根据班级id获取学校id
+     * @param classId 班级id
+     * @return 学校id
+     */
+    Long getSchoolIdByClassId(Long classId);
 }

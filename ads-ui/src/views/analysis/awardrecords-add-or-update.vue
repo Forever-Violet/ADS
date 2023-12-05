@@ -1,9 +1,14 @@
 <template>
   <el-dialog v-model="visible" :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :close-on-press-escape="false">
     <el-form :model="dataForm" :rules="rules" ref="dataFormRef" @keyup.enter="dataFormSubmitHandle()" label-width="160px">
+      <el-form-item v-if="hasSchoolListPermission && !dataForm.id" prop="schoolName" label="所属学校">
+        <el-select v-model="params.schoolId" placeholder="选择学校" clearable @change="schoolChangedHandle">
+          <el-option v-for="school in schoolList" :key="school.schoolId" :label="school.schoolName" :value="school.schoolId"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="学号（姓名）" prop="studentNo" v-if="dataForm.id == ''">
         <!--去掉multiple为单选 , clearable重置, @blur下拉框失去焦点后执行该函数-->
-        <el-select v-model="dataForm.studentNo" placeholder="选择学生" clearable @blur="resetStudentList">
+        <el-select v-model="dataForm.studentNo" placeholder="选择学生" clearable @blur="resetStudentList" @change="updateStudentName">
           <el-input v-model="searchInput" placeholder="请输入关键字" @input="handleSearch" clearable></el-input>
           <!--<el-button type="text" @click="resetStudentList">重置</el-button>-->
           <el-option v-if="studentList.length == 0" :disabled="true" :style="{ textAlign: 'center' }">未查询到数据</el-option>
@@ -53,9 +58,10 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import {reactive, ref, toRefs} from "vue";
 import baseService from "@/service/baseService";
 import { ElMessage } from "element-plus";
+import useView from "@/hooks/useView";
 
 const emit = defineEmits(["refreshDataList"]);
 
@@ -78,17 +84,17 @@ const dataForm = reactive({
   level: "",
   awardName: ""
 });
+const schoolList = ref<any[]>([]);
+const state = reactive({ ...useView(dataForm), ...toRefs(dataForm) });
+const hasSchoolListPermission = state.hasPermission("sys:school:list");
 const awardGradeList = ref([{ name: "" }, { name: "" }, { name: "" }]);
-/*const topic = ref("");
-const subtopic = ref("");
-const level = ref("");*/
-
 const params = reactive({
   topic: "",
   subtopic: "",
-  level: ""
+  level: "",
+  // 学校id单独放出来，因为奖项记录没有schoolId字段，这里只是给超级管理员查询学生列表用的
+  schoolId: ""
 });
-
 const rules = ref({
   studentNo: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
   awardId: [{ required: true, message: "必填项不能为空", trigger: "blur" }],
@@ -97,11 +103,13 @@ const rules = ref({
   remarks: [{ required: true, message: "必填项不能为空", trigger: "blur" }]
 });
 
+
 const init = (id?: number) => {
   visible.value = true;
   dataForm.id = "";
   dataForm.studentNo = "";
   dataForm.awardId = "";
+  params.schoolId = "";
   params.topic = "";
   params.subtopic = "";
   params.level = "";
@@ -110,24 +118,45 @@ const init = (id?: number) => {
   if (dataFormRef.value) {
     dataFormRef.value.resetFields();
   }
-
-  //如果有id说明是更新，那么获取id对应信息回显
   if (id) {
+    // 如果是更新
     getInfo(id);
   } else {
-    //没id说明是新增，新增需要获取学生列表，修改不需要
-    getStudentList();
+    // 如果是新增 ，判断有无学校列表权限
+    if (hasSchoolListPermission) {
+      // 获取学校列表 和学生列表
+      getSchoolList();
+    } else { //无学校列表权限直接获取学生列表
+      getStudentList();
+    }
   }
+};
+
+// 获取学校列表
+const getSchoolList = () => {
+  return baseService.get("/sys/school/list").then((res) => {
+    schoolList.value = res.data;
+    // 检查返回的列表是否非空
+    if (schoolList.value && schoolList.value.length > 0) {
+      // 设置默认选中第一个学校
+      params.schoolId = schoolList.value[0].schoolId;
+    }
+    // 根据默认选中的学校获取数据
+    getStudentList();
+  });
 };
 
 // 获取学生列表
 const getStudentList = () => {
-  return baseService.get("/sys/user/student").then((res) => {
+  let schoolId = "";
+  if (params.schoolId != "") {
+    schoolId = params.schoolId;
+  }
+  return baseService.get("/sys/user/student", { schoolId }).then((res) => {
     studentList.value = res.data;
     originalStudentList.value = res.data;
   });
 };
-
 // 获取奖项列表
 const getAwardList = () => {
   if (params.topic !== "" && params.subtopic !== "" && params.level !== "") {
@@ -203,6 +232,16 @@ const handleSearch = () => {
   }
 };
 
+// 学校改变后，重新获取学生列表
+const schoolChangedHandle = () => {
+  // 学生选框的搜索框清空
+  searchInput.value = "";
+  // 选择的学生置空
+  dataForm.studentNo = "";
+  getStudentList();
+};
+
+
 // 重置学生列表
 const resetStudentList = () => {
   searchInput.value = "";
@@ -219,6 +258,15 @@ const getInfo = (id: number) => {
     params.level = dataForm.level;
     getAwardList(); //奖项列表也重新获取一下，不然首先会显示id??
   });
+};
+
+// 当选择了学生后，填充学生姓名到表单
+const updateStudentName = () => {
+  // 根据选中的学号查找对应的学生姓名
+  const selectStudent = studentList.value.find((student) => student.username === dataForm.studentNo);
+  if (selectStudent) {
+    dataForm.studentName = selectStudent.realName;
+  }
 };
 
 // 表单提交

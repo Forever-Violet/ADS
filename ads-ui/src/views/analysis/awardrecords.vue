@@ -1,12 +1,6 @@
 <template>
   <div class="mod-analysis__awardrecords">
     <el-form :inline="true" :model="state.dataForm" @keyup.enter="state.getDataList()">
-      <el-form-item>
-        <el-button v-if="state.hasPermission('analysis:awardrecords:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button v-if="state.hasPermission('analysis:awardrecords:delete')" type="danger" @click="state.deleteHandle()">删除</el-button>
-      </el-form-item>
       <el-form-item v-if="hasSchoolListPermission">
         <el-select v-model="state.dataForm.schoolId" placeholder="选择学校" clearable> <!--单选 去掉multiple-->
           <el-option v-for="school in schoolList" :key="school.schoolId" :label="school.schoolName" :value="school.schoolId"></el-option>
@@ -39,6 +33,12 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="state.getDataList()">查询</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button v-if="state.hasPermission('analysis:awardrecords:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button v-if="state.hasPermission('analysis:awardrecords:delete')" type="danger" @click="state.deleteHandle()">删除</el-button>
       </el-form-item>
       <el-form-item>
         <el-button v-if="state.hasPermission('sys:user:export')" type="info" @click="state.exportHandle()">导出</el-button>
@@ -92,6 +92,8 @@ const view = reactive({
   deleteIsBatch: true,
   getDataListURL: "/analysis/awardrecords/page",
   getDataListIsPage: true,
+  // 在自动选择学校后才调用getDataList，页面刚创建不调用，如果不是超级管理员，那么还是页面创建时调用
+  createdIsNeed: false,
   exportURL: "/analysis/awardrecords/export",
   deleteURL: "/analysis/awardrecords",
   dataForm: {
@@ -127,6 +129,9 @@ onMounted(() => {
   //有权限，才执行
   if (hasSchoolListPermission) {
     getSchoolList();
+  } else {
+    // 没有学校列表权限的话，直接获取数据
+    state.getDataList();
   }
 });
 
@@ -134,7 +139,13 @@ onMounted(() => {
 const getSchoolList = () => {
   return baseService.get("/sys/school/list").then((res) => {
     schoolList.value = res.data;
+    // 检查返回的列表是否非空
+    if (schoolList.value && schoolList.value.length > 0) {
+      // 设置默认选中第一个学校
+      state.dataForm.schoolId = schoolList.value[0].schoolId;
+    }
+    // 获取数据
+    state.getDataList();
   });
 };
-
 </script>
