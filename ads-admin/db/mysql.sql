@@ -78,7 +78,7 @@ CREATE TABLE sys_user_class (
     key idx_grade_id (grade_id),
     key idx_user_id (user_id),
     key idx_create_date (create_date)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='班级管理';
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户班级管理';
 
 
 -- 五育-权重表 每个学校只有一个权重设置
