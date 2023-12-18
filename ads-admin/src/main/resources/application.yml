@@ -78,4 +78,5 @@ mybatis-plus:
 
 
 analysis:
+  url: "http://10.130.75.82:8000"
   promptTail: "请你从分析上述数据，输出班级的五育成绩分析报告，字数必须不少于200字"

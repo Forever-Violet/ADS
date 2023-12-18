@@ -73,7 +73,8 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
     @Autowired
     RestTemplate restTemplate;
     // 分析接口
-    private final String ANALYSIS_URL = "https://chatglm2.tocmcc.cn:443";
+    @Value("${analysis.url}")
+    private String ANALYSIS_URL;
 
     @Value("${analysis.promptTail}") //班级诊断prompt的尾部
     private String classPromptTail;

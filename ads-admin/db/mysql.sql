@@ -83,7 +83,7 @@ CREATE TABLE sys_user_class (
 
 -- 五育-权重表 每个学校只有一个权重设置
 CREATE TABLE wuyu_weight (
-   id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+   id BIGINT PRIMARY KEY COMMENT '主键',
    school_id BIGINT unique NOT NULL COMMENT '学校ID',
    moral FLOAT(4, 2) NOT NULL COMMENT '德育',
    intellectual FLOAT(4, 2) NOT NULL COMMENT '智育',
@@ -123,7 +123,7 @@ CREATE TABLE wuyu_weight (
 
 -- 五育分析 （因为该记录是有时效性的，即学生的年级班级会变，但记录保留，所以字段上加入学期、年级、班级，）
 CREATE TABLE wuyu_score (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    id BIGINT PRIMARY KEY COMMENT '主键',
     school_id BIGINT NOT NULL COMMENT '学校ID',
     semester_id BIGINT NOT NULL COMMENT '学期ID',
     grade_id BIGINT NOT NULL COMMENT '年级ID',
@@ -172,7 +172,7 @@ CREATE TABLE wuyu_score (
 
 -- 五育分析 结果（报告）表
 CREATE TABLE wuyu_analysis_result (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    id BIGINT PRIMARY KEY COMMENT '主键',
     semester_id BIGINT COMMENT '学期ID',
     class_id BIGINT COMMENT '班级ID',
     score_id BIGINT COMMENT '五育成绩ID',
@@ -190,7 +190,7 @@ CREATE TABLE wuyu_analysis_result (
 
 -- 奖项设置
 CREATE TABLE award_settings (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    id BIGINT PRIMARY KEY COMMENT '主键',
     school_id BIGINT NOT NULL COMMENT '学校ID',
     student_name varchar(50) NOT NULL COMMENT '学生姓名',
     topic tinyint NOT NULL COMMENT '所属五育 0德育, 1智育, 2体育, 3美育, 4劳育',
@@ -206,7 +206,7 @@ CREATE TABLE award_settings (
 
 -- 获奖记录
 CREATE TABLE award_records (
-   id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+   id BIGINT PRIMARY KEY COMMENT '主键',
    student_no varchar(50) NOT NULL COMMENT '学生学号',
    award_id BIGINT NOT NULL COMMENT '奖项id',
    grade VARCHAR(50) NOT NULL COMMENT '获奖等级',

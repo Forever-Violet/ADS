@@ -14,10 +14,10 @@
             <canvas ref="pieChartContainer" width="300px" height="300px"></canvas><!--饼状图容器-->
           </div>
         </div>
-        <div v-if="loading" style="font-size: 16px; text-indent: 2em">
+        <div v-if="loading" style="white-space: pre-wrap; font-size: 16px;">
           {{ dataForm.response }}
         </div>
-        <el-input type="textarea" v-if="!loading" v-model="dataForm.response" placeholder="请输入内容" show-word-limit :rows="5" style="font-size: 16px; text-indent: 2em" maxlength="3000" class="borderless-textarea"></el-input>
+        <el-input type="textarea" v-if="!loading" v-model="dataForm.response" placeholder="请确保该学期该班级有数据导入" show-word-limit :rows="6" style="font-size: 16px; text-indent: 2em" maxlength="3000" class="borderless-textarea"></el-input>
       </div>
       <div v-if="loading" style="text-align: center; font-size: 18px; color: deepskyblue">生成PDF中...</div>
     </el-form>
@@ -44,7 +44,8 @@ const loading = ref(false); //缓冲动画flag
 const reloading = ref(false);
 const barChartContainer = ref<HTMLCanvasElement | null>(null); // 指向图表的引用 chartContainer 的类型为 HTMLCanvasElement
 const pieChartContainer = ref<HTMLCanvasElement | null>(null); //指向饼状图的引用
-let myChart: Chart<"bar", number[], string> | null = null; // 用于保存图表实例
+let myBarChart: Chart<"bar", number[], string> | null = null; // 用于保存图表实例
+let myPieChart: Chart<"pie", number[], string> | null = null; // 用于保存图表实例
 const dialogKey = ref();
 
 const dataForm = reactive({
@@ -69,6 +70,14 @@ const init = (classId: string, semesterId: string) => {
   visible.value = true;
   dataForm.id = "";
   dataForm.response = "";
+  dataForm.moralScore = "";
+  dataForm.intellectualScore = "";
+  dataForm.physicalScore = "";
+  dataForm.artisticScore = "";
+  dataForm.laborScore = "";
+  dataForm.lowLevelNum = "";
+  dataForm.middleLevelNum = "";
+  dataForm.highLevelNum = "";
 
   // 重置表单数据
   if (dataFormRef.value) {
@@ -86,17 +95,22 @@ const initChart = () => {
 };
 
 // 在创建新图表之前，检查这个变量是否已经有一个图表实例。如果有，先销毁它。
+/*
 const destroyChart = () => {
-  if (myChart) {
-    myChart.destroy();
-    myChart = null;
+  if (myBarChart) {
+    myBarChart.destroy();
+    myBarChart = null;
   }
 };
+*/
 
 // 创建条形图的函数
 const createBarChart = () => {
-  // 销毁旧的图表实例
-  destroyChart();
+  // 在创建新图表之前，检查这个变量是否已经有一个图表实例。如果有，先销毁它。
+  if (myBarChart) {
+    myBarChart.destroy();
+    myBarChart = null;
+  }
 
   if (barChartContainer.value) {
     //是否已经指向了一个有效的DOM元素
@@ -115,7 +129,7 @@ const createBarChart = () => {
     const labels = Object.keys(classData);
     const data = Object.values(classData);
 
-    myChart = new Chart(ctx, {
+    myBarChart = new Chart(ctx, {
       type: "bar",
       data: {
         labels: labels,
@@ -152,6 +166,11 @@ const createBarChart = () => {
 };
 // 创建饼状图
 const createPieChart = () => {
+  // 销毁旧的图表实例
+  if (myPieChart) {
+    myPieChart.destroy();
+    myPieChart = null;
+  }
   if (pieChartContainer.value) {
     const ctx = pieChartContainer.value.getContext("2d");
     if (!ctx) return;
@@ -161,7 +180,7 @@ const createPieChart = () => {
     const middleLevel = (parseInt(dataForm.middleLevelNum) / total) * 100;
     const highLevel = (parseInt(dataForm.highLevelNum) / total) * 100;
 
-    new Chart(ctx, {
+    myPieChart = new Chart(ctx, {
       type: "pie",
 
       data: {

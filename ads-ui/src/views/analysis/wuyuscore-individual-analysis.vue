@@ -16,11 +16,10 @@
           {{ dataForm.response }}
         </div>
         <el-input type="textarea" v-if="!loading" v-model="dataForm.response" placeholder="请输入内容" show-word-limit
-                  :rows="4" style="font-size: 16px; text-indent: 2em" maxlength="3000" class="borderless-textarea"></el-input>
+                  :rows="6" style="font-size: 16px; text-indent: 2em" maxlength="3000" class="borderless-textarea"></el-input>
       </div>
       <div v-if="loading" style="text-align: center; font-size: 18px; color: deepskyblue">生成PDF中...</div>
     </el-form>
-    <!--显示换行white-space: pre-line-->
     <div v-if="dataForm.id == '' || reloading" style="text-align: center; font-size: 18px; color: deepskyblue">报告生成中...</div>
     <template v-slot:footer v-if="!loading">
       <el-button type="primary" @click="dataFormSubmitHandle()">保存</el-button>
