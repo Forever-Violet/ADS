@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Mark sunlightcs@gmail.com
  */
-@Aspect
-@Component
+//@Aspect
+//@Component  //暂时注释了，这个东西导致redisTemplate用不了
 public class RedisAspect {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     /**
@@ -33,7 +33,7 @@ public class RedisAspect {
     @Value("${renren.redis.open: false}")
     private boolean open;
 
-    @Around("execution(* io.ads.common.redis.RedisUtils.*(..))")
+    @Around("execution(* io.ads.common.utils.RedisUtils.*(..))")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         Object result = null;
         if (open) {
