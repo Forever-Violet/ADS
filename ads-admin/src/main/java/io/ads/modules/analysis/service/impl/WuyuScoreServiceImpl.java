@@ -23,10 +23,7 @@ import io.ads.modules.security.user.SecurityUser;
 import io.ads.modules.security.user.UserDetail;
 import io.ads.modules.sys.dto.SysUserDTO;
 import io.ads.modules.sys.enums.SuperAdminEnum;
-import io.ads.modules.sys.service.SysSchoolClassService;
-import io.ads.modules.sys.service.SysSchoolGradeService;
-import io.ads.modules.sys.service.SysSchoolSemesterService;
-import io.ads.modules.sys.service.SysUserService;
+import io.ads.modules.sys.service.*;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +63,8 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
     SysSchoolGradeService sysSchoolGradeService;
     @Autowired
     SysSchoolClassService sysSchoolClassService;
+    @Autowired
+    SysRoleUserService sysRoleUserService;
     /**
     //@Autowired
     //WuyuScoreServiceImpl scoreServiceProxy; // 代理对象，用来在本类中执行事务方法，但这样会出现循环依赖，spring2.6后默认不允许这样，所以还是使用AopContext来获取代理对象
@@ -89,6 +88,7 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         String classId = (String)params.get("classId");
         String comprehensiveLevel = (String)params.get("comprehensiveLevel");
         String studentNameOrNo = (String)params.get("studentNameOrNo");
+        String studentNo = "";
 
         // 任教年级列表，（针对老师）
         List<Long> gradeList = new ArrayList<>();
@@ -97,7 +97,18 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         UserDetail user = SecurityUser.getUser();
         if (user.getSuperAdmin() == SuperAdminEnum.NO.value()) {
             schoolId = user.getSchoolId().toString();
+            // 是老师的话，加上年级
             gradeList = sysSchoolGradeService.getGradeIdListByStudentNo(user.getUsername());
+            // 当前用户的角色id列表
+            List<Long> roleIdList = sysRoleUserService.getRoleIdList(user.getId());
+            if (roleIdList.size() == 1) {
+                List<String> roleNameList = sysRoleUserService.getRoleNameList(roleIdList);
+                // 如果是学生，只能查询他自己的分数和报告
+                if (!roleNameList.isEmpty() && "学生".equals(roleNameList.get(0))) {
+                    studentNo = user.getUsername();
+                }
+            }
+
         }
 
 
@@ -108,6 +119,8 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
                 .eq(StrUtil.isNotBlank(semesterId), "semester_id", semesterId)
                 .eq(StrUtil.isNotBlank(gradeId), "grade_id", gradeId)
                 .eq(StrUtil.isNotBlank(classId), "class_id", classId)
+                .eq(StrUtil.isNotBlank(classId), "class_id", classId)
+                .eq(StrUtil.isNotBlank(studentNo), "student_no", studentNo)
                 .in(!gradeList.isEmpty(), "grade_id", gradeList) //任教年级列表
                 .like(StrUtil.isNotBlank(studentNameOrNo), "student_name", studentNameOrNo)
                 .or()

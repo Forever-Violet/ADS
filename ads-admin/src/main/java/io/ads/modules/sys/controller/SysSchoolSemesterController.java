@@ -105,8 +105,8 @@ public class SysSchoolSemesterController {
     }
 
     @GetMapping("list")
-    @ApiOperation("获取年级列表")
-    @RequiresPermissions("sys:grade:list")
+    @ApiOperation("获取学期列表")
+    @RequiresPermissions("sys:semester:list")
     public Result<List<SysSchoolSemesterDTO>> list(@ApiIgnore @RequestParam Map<String, Object> params){
         List<SysSchoolSemesterDTO> list = sysSchoolSemesterService.list(params);
 

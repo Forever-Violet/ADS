@@ -8,6 +8,7 @@
 
 package io.ads.modules.job.task;
 
+import cn.hutool.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,16 @@ public class TestTask implements ITask{
 
 	@Override
 	public void run(String params){
+		// 将字符串转换为JSONObject
+		JSONObject jsonObject = new JSONObject(params);
+
+		// 获取属性值
+		String host = jsonObject.get("host", String.class);
+		String port = jsonObject.get("port", String.class);
+
+		// 打印获取的值
+		System.out.println("Host: " + host);
+		System.out.println("Port: " + port);
 		logger.debug("TestTask定时任务正在执行，参数为：{}", params);
 	}
 }

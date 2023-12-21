@@ -13,20 +13,20 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="state.dataForm.gradeId" placeholder="选择年级" clearable @change="resetClassList">
+        <el-select v-if="hasGradeListPermission" v-model="state.dataForm.gradeId" placeholder="选择年级" clearable @change="resetClassList">
           <el-option v-for="grade in gradeList" :key="grade.id" :label="grade.gradeName" :value="grade.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="state.dataForm.classId" placeholder="选择班级" clearable>
+        <el-select v-if="hasGradeListPermission" v-model="state.dataForm.classId" placeholder="选择班级" clearable>
           <el-option v-for="clazz in classList" :key="clazz.id" :label="clazz.className" :value="clazz.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
-        <ren-select v-model="state.dataForm.comprehensiveLevel" dict-type="comprehensiveLevel" placeholder="综合等级"></ren-select>
+        <ren-select v-if="hasGradeListPermission" v-model="state.dataForm.comprehensiveLevel" dict-type="comprehensiveLevel" placeholder="综合等级"></ren-select>
       </el-form-item>
       <el-form-item>
-        <el-input v-model="state.dataForm.studentNameOrNo" placeholder="学号或姓名" clearable></el-input>
+        <el-input v-if="hasGradeListPermission" v-model="state.dataForm.studentNameOrNo" placeholder="学号或姓名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="state.getDataList()">查询</el-button>
@@ -158,16 +158,21 @@ const gradeList = ref<any[]>([]);
 const classList = ref<any[]>([]);
 const semesterList = ref<any[]>([]);
 const hasSchoolListPermission = state.hasPermission("sys:school:list"); // 检查用户是否拥有展示学校列表权限
+const hasGradeListPermission = state.hasPermission("sys:grade:list"); // 检查用户是否拥有展示年级列表权限，即判断是否非学生
 
 onMounted(() => {
   //有权限，才执行
   if (hasSchoolListPermission) {
     // 如果是超级管理员，那么先不获取年级列表和学期列表，在选择了学校后会自动获取
     getSchoolList();
-  } else {
+  } else if (hasGradeListPermission){
     //如果不是超级管理员，即如果没有学校列表权限，直接获取年级列表和学期列表
     getGradeList();
     getSemesterList();
+  } else {
+    // 学生
+    getSemesterList();
+
   }
 });
 

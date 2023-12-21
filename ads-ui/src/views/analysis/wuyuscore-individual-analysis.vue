@@ -22,19 +22,20 @@
     </el-form>
     <div v-if="dataForm.id == '' || reloading" style="text-align: center; font-size: 18px; color: deepskyblue">报告生成中...</div>
     <template v-slot:footer v-if="!loading">
-      <el-button type="primary" @click="dataFormSubmitHandle()">保存</el-button>
-      <el-button type="warning" @click="reCreateReportHandle()">重新生成</el-button>
+      <el-button v-if="isNotStudent" type="primary" @click="dataFormSubmitHandle()">保存</el-button>
+      <el-button v-if="isNotStudent" type="warning" @click="reCreateReportHandle()">重新生成</el-button>
       <el-button type="info" @click="exportPDFHandle()">导出为PDF</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, onMounted, watch, nextTick } from "vue";
+import { reactive, ref, toRefs, onMounted, watch, nextTick } from "vue";
 import baseService from "@/service/baseService";
 import { ElMessage } from "element-plus";
 import htmlToPdf from "@/utils/htmlToPDF";
 import Chart from "chart.js/auto";
+import useView from "@/hooks/useView";
 
 const visible = ref(false);
 const dataFormRef = ref();
@@ -53,6 +54,8 @@ const dataForm = reactive({
   studentName: "",
   response: ""
 });
+const state = reactive({ ...useView(dataForm), ...toRefs(dataForm) });
+const isNotStudent = state.hasPermission("sys:grade:list"); //通过是否拥有年级列表的权限来判断是不是学生
 const score = reactive({
   id: "",
   schoolId: "",
