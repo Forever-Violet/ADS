@@ -1,21 +1,25 @@
 package io.ads.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.ads.common.exception.RenException;
 import io.ads.common.service.impl.CrudServiceImpl;
 import io.ads.common.utils.ConvertUtils;
 import io.ads.modules.security.user.SecurityUser;
 import io.ads.modules.security.user.UserDetail;
+import io.ads.modules.sys.dao.SysSchoolClassDao;
 import io.ads.modules.sys.dao.SysSchoolGradeDao;
 import io.ads.modules.sys.dto.SysSchoolClassDTO;
 import io.ads.modules.sys.dto.SysSchoolGradeDTO;
 import io.ads.modules.sys.entity.SysSchoolClassEntity;
 import io.ads.modules.sys.entity.SysSchoolGradeEntity;
+import io.ads.modules.sys.entity.SysSchoolSemesterEntity;
 import io.ads.modules.sys.enums.SuperAdminEnum;
 import io.ads.modules.sys.service.SysSchoolGradeService;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +31,9 @@ import java.util.Map;
  */
 @Service
 public class SysSchoolGradeServiceImpl extends CrudServiceImpl<SysSchoolGradeDao, SysSchoolGradeEntity, SysSchoolGradeDTO> implements SysSchoolGradeService {
+
+    @Resource
+    SysSchoolClassDao sysSchoolClassDao;
 
     @Override
     public QueryWrapper<SysSchoolGradeEntity> getWrapper(Map<String, Object> params){
@@ -66,5 +73,19 @@ public class SysSchoolGradeServiceImpl extends CrudServiceImpl<SysSchoolGradeDao
     @Override
     public List<Long> getGradeIdListByStudentNo(String studentNo) {
         return baseDao.getGradeIdByStudentNo(studentNo);
+    }
+
+    @Override
+    public void delete(Long[] ids) {
+        for (Long gradeId : ids) {
+            QueryWrapper<SysSchoolClassEntity> qw1 = new QueryWrapper<>();
+            //限制数量1
+            qw1.eq("grade_id", gradeId)
+                    .last("LIMIT 1");
+            if (sysSchoolClassDao.selectOne(qw1) != null ) {
+                throw new RenException("年级下有班级，无法删除，请先删除班级信息");
+            }
+        }
+        super.delete(ids);
     }
 }

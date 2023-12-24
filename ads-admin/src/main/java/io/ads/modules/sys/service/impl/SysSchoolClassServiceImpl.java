@@ -3,6 +3,7 @@ package io.ads.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.ads.common.constant.Constant;
+import io.ads.common.exception.RenException;
 import io.ads.common.page.PageData;
 import io.ads.common.service.impl.CrudServiceImpl;
 import io.ads.common.utils.ConvertUtils;
@@ -15,6 +16,7 @@ import io.ads.modules.sys.dto.SysSchoolClassDTO;
 import io.ads.modules.sys.dto.SysSchoolClassDTO;
 import io.ads.modules.sys.entity.SysSchoolClassEntity;
 import io.ads.modules.sys.entity.SysSchoolClassEntity;
+import io.ads.modules.sys.entity.SysUserClassEntity;
 import io.ads.modules.sys.enums.SuperAdminEnum;
 import io.ads.modules.sys.service.SysSchoolClassService;
 import cn.hutool.core.util.StrUtil;
@@ -132,5 +134,19 @@ public class SysSchoolClassServiceImpl extends CrudServiceImpl<SysSchoolClassDao
     @Override
     public String getGradeNameByClassId(Long classId) {
         return sysUserClassDao.getGradeNameById(classId);
+    }
+
+
+    @Override
+    public void delete(Long[] ids) {
+        for (Long classId : ids) {
+            QueryWrapper<SysUserClassEntity> qw1 = new QueryWrapper<>();
+            qw1.eq("class_id", classId)
+                    .last("LIMIT 1");
+            if (sysUserClassDao.selectOne(qw1) != null ) {
+                throw new RenException("班级下有用户，无法删除，请先删除该班级的用户信息");
+            }
+        }
+        super.delete(ids);
     }
 }

@@ -170,12 +170,14 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long[] ids) {
         //删除用户
         baseDao.deleteBatchIds(Arrays.asList(ids));
 
         //删除角色用户关系
         sysRoleUserService.deleteByUserIds(ids);
+        System.out.println("sysRoleUserService.deleteByUserIds(ids);");
         //删除班级用户关系
         sysUserClassService.deleteByUserIds(ids);
     }

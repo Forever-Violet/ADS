@@ -153,7 +153,7 @@ public class SysUserController {
         //效验数据
         AssertUtils.isArrayEmpty(ids, "id");
 
-        sysUserService.deleteBatchIds(Arrays.asList(ids));
+        sysUserService.delete(ids);
 
         return new Result();
     }
