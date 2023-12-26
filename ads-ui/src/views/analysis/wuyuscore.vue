@@ -272,7 +272,6 @@ const fileChanged = (event: Event) => {
   const uploadUrl = `${app.api}/analysis/wuyuscore/upload?token=${getToken()}`;
   const formData = new FormData();
   formData.append("file", file);
-
   axios
     .post(uploadUrl, formData, {
       headers: { "Content-Type": "multipart/form-data" }
@@ -302,6 +301,8 @@ const fileChanged = (event: Event) => {
       console.error("文件上传失败", error);
       ElMessage.error("文件上传失败");
     });
+  // 文件上传后，清除fileInput的值，以便下次可以重新出发change事件
+  target.value = "";
 };
 
 // 监听 state.dataForm 中的某些属性
