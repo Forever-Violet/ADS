@@ -38,21 +38,9 @@ public class DatabaseBackupTask implements ITask{
         if (!folder.exists()) { //不存在则创建文件夹
             folder.mkdirs();
         }
-
         // 设置备份文件名为当前日期
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         String fileName = backupFile + "_" + dateFormat.format(new Date()) + ".sql";
-
-/*        // 构造备份命令
-        String command = "mysqldump -h" + host
-                + " -P" + port
-                + " -u" + user
-                + " -p" + password
-                + " --add-drop-database --databases " + database
-                + " -r " + folderPath + fileName;
-
-        // 执行备份命令
-        Process process = Runtime.getRuntime().exec(command);*/
         List<String> command = new ArrayList<>();
         command.add("mysqldump");
         command.add("-h" + host);
@@ -75,8 +63,6 @@ public class DatabaseBackupTask implements ITask{
             System.out.println("数据库备份失败");
         }
     }
-
-
     @Override
     public void run(String params) throws Exception {
         // 将字符串转换为JSONObject

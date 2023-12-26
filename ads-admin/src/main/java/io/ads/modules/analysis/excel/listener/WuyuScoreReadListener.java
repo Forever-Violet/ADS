@@ -23,7 +23,6 @@ public class WuyuScoreReadListener implements ReadListener<WuyuScoreImportExcel>
     @Override
     public void invoke(WuyuScoreImportExcel wuyuScore, AnalysisContext context) {
         // 处理每一行数据，本来的话是在这里把每条数据存储数据库，但是我们需要存储的不是Excel对象，所以还是在Service中处理比较方便，这里就当个摆设
-
         //list.add(wuyuScore);
         // 达到缓冲区最大空间，去存储到数据库，防止数据太多在内存，导致OOM
 /*        if (list.size() >= BATCH_COUNT) {

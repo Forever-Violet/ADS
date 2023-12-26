@@ -178,7 +178,6 @@ public class WuyuScoreController {
     @RequiresPermissions("analysis:wuyuscore:export")
     public void exportTemplate(@ApiIgnore @RequestParam Map<String, Object> params, HttpServletResponse response) throws Exception {
 
-
         ExcelUtils.exportExcelToTarget(response, "五育成绩导入模板", "五育成绩导入模板", new ArrayList<>(), WuyuScoreImportExcel.class);
     }
 

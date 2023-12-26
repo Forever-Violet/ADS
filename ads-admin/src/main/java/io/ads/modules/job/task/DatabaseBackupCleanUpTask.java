@@ -26,7 +26,6 @@ public class DatabaseBackupCleanUpTask implements ITask{
     public static void backupFileCleanUp(int daysToKeep) throws Exception {
         String backupFolderPath;
         String os = System.getProperty("os.name").toLowerCase();
-
         // 根据操作系统设置备份文件夹路径
         if (os.contains("win")) {
             // Windows系统，默认备份路径
@@ -38,11 +37,9 @@ public class DatabaseBackupCleanUpTask implements ITask{
             // 其他系统
             throw new Exception("暂不支持该操作系统！");
         }
-
         File backupFolder = new File(backupFolderPath);
         // 文件列表
         File[] backupFiles = backupFolder.listFiles();
-
         if (backupFiles != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
@@ -84,8 +81,6 @@ public class DatabaseBackupCleanUpTask implements ITask{
             throw new Exception("备份文件夹为空");
         }
     }
-
-
     @Override
     public void run(String params) throws Exception {
         // 将字符串转换为JSONObject

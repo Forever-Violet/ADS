@@ -134,19 +134,17 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
     @Override
     @Transactional
     public void save(WuyuScoreDTO dto) {
-
-        dto = calComprehensiveScoreAndLevel(dto);
-        // todo 学业等级怎么确定待商榷，先固定
+        //计算综合分数和登记
+        calComprehensiveScoreAndLevel(dto);
+        // 学业等级先固定
         dto.setAcademicLevel(1);
-
-        // todo 每个学生一学期只有一个诊断报告，这个待定
+        // 每个学生一学期只有一个诊断报告，这个待定
         WuyuScoreEntity entity = new WuyuScoreEntity();
         BeanUtils.copyProperties(dto, entity);
         // 填充 学期id
         if (entity.getSemesterId() == null) { //如果学期id为空
             // 查询 该学校当前最新的学期，默认按最新学期填入
             entity.setSemesterId(sysSchoolSemesterService.getLatestSemesterId(entity.getSchoolId()));
-            //System.out.println("空了----------------");
         }
         // 填充 年级id，根据学号
         entity.setGradeId(sysSchoolGradeService.getGradeIdListByStudentNo(entity.getStudentNo()).get(0));
@@ -170,7 +168,6 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         // 更新诊断报告记录，诊断报告 关联 五育分数id，
         reportEntity.setScoreId(entity.getId());
         wuyuAnalysisResultDao.updateById(reportEntity);
-
     }
 
     @Override
@@ -179,7 +176,7 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long[] ids) {
         // 先根据五育分数id关联的诊断报告id，删除个人诊断报告
         for (Long id : ids) {
@@ -437,31 +434,7 @@ public class WuyuScoreServiceImpl extends CrudServiceImpl<WuyuScoreDao, WuyuScor
         // 读取Excel文件内容
         List<WuyuScoreImportExcel> wuyuScoreExcelList =
                 ExcelUtils.readExcel(inputStream, WuyuScoreImportExcel.class, new WuyuScoreReadListener());
-        /**
-        // 处理成功的记录数
-        int success = 0;
-        // 处理失败的记录数
-        int failed = 0;
-        // 处理数据
-        for (WuyuScoreImportExcel scoreExcel : wuyuScoreExcelList) {
-            // 如果当前行记录的学生学号为空，那么直接跳过
-            // 检查当前行记录的学生是否存在于系统，不存在则直接跳过
-            if (scoreExcel.getStudentNo() == null || sysUserService.getByUsername(scoreExcel.getStudentNo()) == null) {
-                failed++;
-                continue; // 如果不存在，那么直接跳过
-            }
-            WuyuScoreDTO scoreDTO = ConvertUtils.sourceToTarget(scoreExcel, WuyuScoreDTO.class);
-            // 用代理对象执行事务方法，防止事务失效
-            try {
-                scoreServiceProxy.save(scoreDTO);
-            } catch (Exception e) {
-                failed++;
-                // 捕到异常不管，继续执行
-                continue;
-            }
-            // 成功处理记录数加1
-            success++;
-        }*/
+
         // 处理成功的记录数 AtomicInteger的incrementAndGet是线程安全的++
         AtomicInteger success = new AtomicInteger(0);
         // 处理失败的记录数

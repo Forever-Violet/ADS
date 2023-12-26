@@ -5,13 +5,13 @@
         <h3 style="text-align: center">{{ dataForm.gradeName }} - {{ dataForm.className }} - 班级诊断报告</h3>
         <div>
           <div>
-            <canvas ref="barChartContainer" width="300px" height="300px"></canvas><!--条形图容器-->
+            <canvas ref="barChartContainer" width="100%" height="500"></canvas><!--条形图容器-->
           </div>
           <div style="text-align: center; margin-top: 5px; margin-bottom: 3px; font-size: 16px; color: #6d6c6c;">
             学生五育综合等级分布
           </div>
           <div>
-            <canvas ref="pieChartContainer" width="300px" height="300px"></canvas><!--饼状图容器-->
+            <canvas ref="pieChartContainer" width="400" height="400"></canvas><!--饼状图容器-->
           </div>
         </div>
         <div v-if="loading" style="white-space: pre-wrap; font-size: 16px;">
@@ -78,11 +78,15 @@ const init = (classId: string, semesterId: string) => {
   dataForm.lowLevelNum = "";
   dataForm.middleLevelNum = "";
   dataForm.highLevelNum = "";
-
+  reloading.value = false; //重置标志
+  loading.value = false;
+  myBarChart = null;
+  myPieChart = null;
   // 重置表单数据
   if (dataFormRef.value) {
     dataFormRef.value.resetFields();
   }
+
   getInfo(classId, semesterId);
 };
 

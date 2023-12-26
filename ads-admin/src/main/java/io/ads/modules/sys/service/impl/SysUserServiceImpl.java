@@ -177,7 +177,7 @@ public class SysUserServiceImpl extends BaseServiceImpl<SysUserDao, SysUserEntit
 
         //删除角色用户关系
         sysRoleUserService.deleteByUserIds(ids);
-        
+
         //删除班级用户关系
         sysUserClassService.deleteByUserIds(ids);
     }

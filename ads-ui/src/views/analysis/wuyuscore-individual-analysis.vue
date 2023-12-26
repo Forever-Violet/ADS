@@ -95,6 +95,9 @@ const init = async (id: string) => {
   visible.value = true;
   dataForm.id = "";
   dataForm.response = "";
+  reloading.value = false; //重置标志
+  loading.value = false;
+  myChart = null;
 
   // 重置表单数据
   if (dataFormRef.value) {
