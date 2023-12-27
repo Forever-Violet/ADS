@@ -1,11 +1,11 @@
 <template>
-  <el-dialog v-model="visible" title="" :close-on-click-modal="false" :close-on-press-escape="false" @opened="initChart" :key="dialogKey">
+  <el-dialog v-model="visible" title="" :close-on-click-modal="false" width="1000" :close-on-press-escape="false" @opened="initChart" :key="dialogKey">
     <el-form :model="dataForm" v-if="!reloading" ref="dataFormRef" label-width="0px">
       <div id="pdfDom">
         <h3 style="text-align: center">{{ dataForm.gradeName }} - {{ dataForm.className }} - 班级诊断报告</h3>
         <div>
-          <div>
-            <canvas ref="barChartContainer" width="100%" height="500"></canvas><!--条形图容器-->
+          <div style="display: flex; justify-content: center; align-items: center;">
+            <canvas ref="barChartContainer" width="300" height="400"></canvas><!--条形图容器-->
           </div>
           <div style="text-align: center; margin-top: 5px; margin-bottom: 3px; font-size: 16px; color: #6d6c6c;">
             学生五育综合等级分布

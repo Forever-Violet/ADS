@@ -9,9 +9,9 @@ const htmlToPdf = {
       allowTaint: false,
       logging: false,
       useCORS: true,
-      scale: 2 // 按比例增加分辨率
+      //scale: 2.5 // 按比例增加分辨率
     }).then((canvas) => {
-      const pdf = new jsPDF('p', 'mm', 'a4'); // A4纸，纵向
+      const pdf = new jsPDF("p", "mm", "a4"); // A4纸，纵向
       const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
       const a4w = 190;
       const a4h = 272; // A4大小，210mm x 297mm，四边各保留10mm的边距，显示区域190x277
@@ -36,8 +36,8 @@ const htmlToPdf = {
           0
         );
         pdf.addImage(
-          page.toDataURL('image/jpeg', 1.0),
-          'JPEG',
+          page.toDataURL("image/jpeg", 1.0),
+          "JPEG",
           10,
           10,
           a4w,
@@ -48,13 +48,10 @@ const htmlToPdf = {
         if (renderedHeight < canvas.height) {
           pdf.addPage(); // 如果后面还有内容，添加一个空页
         }
-        // delete page; // 在TS中通常不需要手动删除
       }
       // 保存文件
       pdf.save(`${title}.pdf`);
       onCompleted(); // 调用回调函数
-      // loading = false;
-      //console.log(loading);
     });
   }
 };
