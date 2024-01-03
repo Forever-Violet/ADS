@@ -3,7 +3,7 @@
     <el-form :model="dataForm" v-if="!reloading" ref="dataFormRef" label-width="0px">
       <div id="pdfDom">
         <h3 style="text-align: center">{{ dataForm.gradeName }} - {{ dataForm.className }} - 班级诊断报告</h3>
-        <div>
+        <div style="padding: 10px;">
           <div style="display: flex; justify-content: center; align-items: center;">
             <canvas ref="barChartContainer" width="300" height="400"></canvas><!--条形图容器-->
           </div>

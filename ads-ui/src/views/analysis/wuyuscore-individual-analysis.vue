@@ -276,5 +276,3 @@ defineExpose({
   init
 });
 </script>
-
-<style scoped></style>

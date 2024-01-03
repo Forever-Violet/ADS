@@ -6,10 +6,10 @@ const htmlToPdf = {
     // loading = true;
     console.log(loading);
     html2canvas(document.querySelector("#pdfDom") as HTMLElement, {
-      allowTaint: false,
-      logging: false,
       useCORS: true,
-      //scale: 2.5 // 按比例增加分辨率
+      allowTaint: true,
+      logging: false,
+      scale: 2 // 按比例增加分辨率
     }).then((canvas) => {
       const pdf = new jsPDF("p", "mm", "a4"); // A4纸，纵向
       const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -36,12 +36,14 @@ const htmlToPdf = {
           0
         );
         pdf.addImage(
-          page.toDataURL("image/jpeg", 1.0),
-          "JPEG",
+          page.toDataURL("image/png", 1.0),
+          "PNG",
           10,
           10,
           a4w,
           Math.min(a4h, (a4w * page.height) / page.width),
+          "",
+          "FAST"
         ); // 添加图像到页面，保留10mm边距
 
         renderedHeight += imgHeight;
