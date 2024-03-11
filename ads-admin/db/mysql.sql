@@ -61,7 +61,7 @@ CREATE TABLE sys_school_grade (
 CREATE TABLE sys_school_class (
     id bigint PRIMARY KEY COMMENT 'id',
     school_id BIGINT NOT NULL COMMENT '学校ID',
-    grade_id BIGINT NOT NULL COMMENT '年级ID',
+    class_id BIGINT NOT NULL COMMENT '年级ID',
     class_name VARCHAR(255) NOT NULL COMMENT '班级名称',
     remark varchar(100) COMMENT '备注',
     create_date datetime COMMENT '创建时间',
