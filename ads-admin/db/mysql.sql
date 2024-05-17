@@ -192,7 +192,6 @@ CREATE TABLE wuyu_analysis_result (
 CREATE TABLE award_settings (
     id BIGINT PRIMARY KEY COMMENT '主键',
     school_id BIGINT NOT NULL COMMENT '学校ID',
-    student_name varchar(50) NOT NULL COMMENT '学生姓名',
     topic tinyint NOT NULL COMMENT '所属五育 0德育, 1智育, 2体育, 3美育, 4劳育',
     subtopic tinyint NOT NULL COMMENT '所属小类 0奖惩记录, 1实验与竞赛, 2学业成绩, 3体育特长, 4美育成果, 5劳动实践',
     level tinyint NOT NULL COMMENT '级别 0国家级, 1省级, 2市厅级, 3区级, 4校级',
